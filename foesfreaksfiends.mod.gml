@@ -1,6 +1,7 @@
 #define init
 
 		global.sprMaggotCharge = sprite_add("sprites/WoolyMaggotFamily/WoolyMaggot/sprMaggotCharge.png", 4, 8, 8);
+		global.sprStaticTrail = sprite_add("sprites/WoolyMaggotFamily/WoolyMaggot/sprStaticTrail.png", 3, 4, 4);
 
 // this makes it so when you press B it spawns the enemy, comment it out or delete it when you don't need it anymore
 
@@ -26,6 +27,7 @@
 		spr_hurt = sprMaggotHurt;
 		spr_dead = sprMaggotDead;
 		spr_fire = global.sprMaggotCharge;
+	
 		
 		sprite_index    = spr_idle;
 		image_speed     = 0.4;
@@ -100,6 +102,10 @@
         maxspeed = chargespeed;
         
         charge_time -= current_time_scale;
+        
+        with instance_create(x, y, PlasmaTrail){
+		sprite_index = global.sprStaticTrail;
+		}
     
     	if (charge_time <= 0) {
         charging = false;
