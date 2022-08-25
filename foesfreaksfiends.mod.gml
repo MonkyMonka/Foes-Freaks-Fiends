@@ -1,3 +1,6 @@
+#define init
+
+		global.sprMaggotCharge = sprite_add("sprites/WoolyMaggotFamily/WoolyMaggot/sprMaggotCharge.png", 4, 8, 8);
 
 // this makes it so when you press B it spawns the enemy, comment it out or delete it when you don't need it anymore
 
@@ -22,6 +25,8 @@
 		spr_walk = sprMaggotIdle;
 		spr_hurt = sprMaggotHurt;
 		spr_dead = sprMaggotDead;
+		spr_fire = global.sprMaggotCharge;
+		
 		sprite_index    = spr_idle;
 		image_speed     = 0.4;
 		depth           = -2;
@@ -37,11 +42,14 @@
         // Vars:
         mask_index    = mskMaggot;
         direction     = random(360);
-        maxhealth     = 1;
+        maxhealth     = 4;
        	my_health     = maxhealth;
-        raddrop       = 12;
-        maxspeed      = 3.5;
+        raddrop       = 2;
+        charge_time = 0;
+        chargespeed   = 5;
+        maxspeed      = 2.5;
         walkspeed     = maxspeed;
+        charging	  = false;
         canmelee      = 1;
         meleedamage   = 2;
         team          = 1;
@@ -87,10 +95,22 @@
 		//Speed Cap:
 	if(speed > maxspeed){ speed = maxspeed; }
 	
-		 // Animate:
-	if(anim_end){ sprite_index = (speed > 0) ? spr_walk : spr_idle; }
-	
-	else sprite_index = enemy_sprite;
+		  // Animate:
+   if (charging == true){
+        maxspeed = chargespeed;
+        
+        charge_time -= current_time_scale;
+    
+    	if (charge_time <= 0) {
+        charging = false;
+		}
+    }
+    if(anim_end){
+		    if (!charging) {
+		    	maxspeed = walkspeed;
+		        sprite_index = enemy_sprite;
+		    }
+    	}	
 	
 		//Use Your Eyes:
 	right = (gunangle + 270) mod 360 > 180 ? 1 : -1;
@@ -120,26 +140,16 @@
 			if(chance(3, 4) and (target_distance > 32)){
 			    
 			    // set the attack timer here if you want to have a different timer from the walkin and such.
-				alarm1 = 45 + irandom(20);
+				alarm1 = 20 + irandom(20);
 				
 				// this makes them do that !!! notice before attacking, you don't need this. Add this for attacks that would be annoying without it.
 				instance_create(x,y,AssassinNotice)
-				wait(10);
-				
-				// literally just do what you do for spawning projectiles in weapons pretty much.
-				repeat(22){
-					if !instance_exists(self){ exit; }
-					with instance_create(x,y,EnemyBullet3){
-						speed		= 9 + random(5);
-						direction	= other.gunangle + random_range(-26,26);
-						image_angle = direction;
-						creator		= other;
-						team		= other.team
-						hitid		= other.hitid;
-					}
-					sound_play_pitch(sndDoubleShotgun, 1.1 + random(0.3));
-					motion_add(gunangle,-3)
-				}
+				image_index = 0;
+        		sprite_index = spr_fire;
+				charging = true;
+				charge_time = 40;
+				enemy_walk(target_direction + orandom(30), alarm1 - 10);
+		
 			}
 			
 			         // this makes em move away if too close, see where this connects to the target distance check above.
