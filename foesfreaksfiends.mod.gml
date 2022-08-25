@@ -1,11 +1,44 @@
 #define init
 
+		global.level_start = false;
+		
 		global.sprMaggotCharge = sprite_add("sprites/WoolyMaggotFamily/WoolyMaggot/sprMaggotCharge.png", 4, 8, 8);
 		global.sprStaticTrail = sprite_add("sprites/WoolyMaggotFamily/WoolyMaggot/sprStaticTrail.png", 3, 4, 4);
 
 // this makes it so when you press B it spawns the enemy, comment it out or delete it when you don't need it anymore
 
 #define step 
+    
+      // Level Start:
+    if(instance_exists(GenCont)){
+        global.level_start = true;
+    }
+    else{
+        if(global.level_start){
+
+        switch(GameCont.area){
+            
+        //#region FROZEN CITY:
+            case 5:
+            case "city":
+            
+            with(Wolf){
+                if(random(5) < 1){
+                    mod_script_call('mod', 'foesfreaksfiends', 'WoolyMaggot_create', x, y);
+                    instance_delete(self);
+                }
+            }
+            
+            break;
+        //#endregion
+                           
+            }
+
+            global.level_start = false;
+        }
+    }
+    
+    
     if button_pressed(0,"horn"){
 	repeat(1){
 	WoolyMaggot_create(mouse_x,mouse_y);
