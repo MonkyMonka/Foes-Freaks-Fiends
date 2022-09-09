@@ -2,10 +2,15 @@
 
 		global.level_start = false;
 		
-		global.sprMaggotCharge = sprite_add("sprites/WoolyMaggotFamily/WoolyMaggot/sprMaggotCharge.png", 4, 8, 8);
+		//Wooly Maggot Sprites:
+		global.sprWoolyMaggotIdle = sprite_add("sprites/WoolyMaggotFamily/WoolyMaggot/sprWoolyMaggotIdle.png", 4, 8, 8);
+		global.sprWoolyMaggotHurt = sprite_add("sprites/WoolyMaggotFamily/WoolyMaggot/sprWoolyMaggotHurt.png", 3, 8, 8);
+		global.sprWoolyMaggotDead = sprite_add("sprites/WoolyMaggotFamily/WoolyMaggot/sprWoolyMaggotDead.png", 6, 8, 8);
+		global.sprWoolyMaggotCharge = sprite_add("sprites/WoolyMaggotFamily/WoolyMaggot/sprWoolyMaggotCharge.png", 5, 8, 8);
 		global.sprStaticTrail = sprite_add("sprites/WoolyMaggotFamily/WoolyMaggot/sprStaticTrail.png", 3, 4, 4);
 
 // this makes it so when you press B it spawns the enemy, comment it out or delete it when you don't need it anymore
+
 
 #define step 
     
@@ -18,12 +23,11 @@
 
         switch(GameCont.area){
             
-        //#region FROZEN CITY:
             case 5:
             case "city":
             
             with(Wolf){
-                if(random(5) < 1){
+                if(random(3) < 1){
                     mod_script_call('mod', 'foesfreaksfiends', 'WoolyMaggot_create', x, y);
                     instance_delete(self);
                 }
@@ -45,7 +49,7 @@
 	    }
     } 
 
-
+//#region FROZEN CITY:
 #define WoolyMaggot_create(_x, _y)
 	with instance_create(_x, _y, CustomEnemy){
     	
@@ -55,11 +59,11 @@
     	
         // this is where you'll set your sprites and such, nts_color_blood isn't needed but makes it work with various blood mods, so its just nice to add.
         // Visuals:
-        spr_idle = sprMaggotIdle;
-		spr_walk = sprMaggotIdle;
-		spr_hurt = sprMaggotHurt;
-		spr_dead = sprMaggotDead;
-		spr_fire = global.sprMaggotCharge;
+        spr_idle = global.sprWoolyMaggotIdle;
+		spr_walk = global.sprWoolyMaggotIdle;
+		spr_hurt = global.sprWoolyMaggotHurt
+		spr_dead = global.sprWoolyMaggotDead;
+		spr_fire = global.sprWoolyMaggotCharge;
 	
 		
 		sprite_index    = spr_idle;
@@ -69,9 +73,6 @@
         spr_shadow      = shd16;	
         nts_color_blood = [c_red, make_color_rgb(134, 44, 35)]
         
-        // Sounds:
-        snd_hurt = sndBigMaggotHit;
-        snd_dead = sndBigMaggotDie;
         
         // this is where you change your enemy's stats and add any needed variables, most should be self explanatory but if you need help ask.
         // Vars:
@@ -92,6 +93,8 @@
         target        = 0;
         walk          = 0;
         gunangle      = 180;
+        fff_bloomamount = 0;
+        fff_bloomtransparency = 0.1;
 
         // setting your alarm amounts here is basically just how quickly they can attack after spawning, usually just keep it at this amount.
         // if you need something to be able to attack RIGHT after spawning set it to like 10 or something.
@@ -107,8 +110,8 @@
         //Scripts:
         on_step  = script_ref_create(WoolyMaggot_step);
         on_draw  = BasicEnemy_draw;
-        on_hurt  = Enemy_hurt;
-        on_death = StandardDrops;
+        on_hurt  = WoolyMaggot_hurt;
+        on_death = LowDrops;
         on_alrm1 = script_ref_create(WoolyMaggot_alrm1);
         
         return self;
@@ -133,8 +136,12 @@
 		  // Animate:
    if (charging == true){
         maxspeed = chargespeed;
-        
+       
         charge_time -= current_time_scale;
+  
+		fff_bloomamount = 1.7;
+		
+		sound_play_pitchvol(sndLightningReload, 0.5, 5);
         
         with instance_create(x, y, PlasmaTrail){
 		sprite_index = global.sprStaticTrail;
@@ -147,6 +154,8 @@
     if(anim_end){
 		    if (!charging) {
 		    	maxspeed = walkspeed;
+		    	fff_bloomamount = 0;
+		    		
 		        sprite_index = enemy_sprite;
 		    }
     	}	
@@ -181,10 +190,9 @@
 			    // set the attack timer here if you want to have a different timer from the walkin and such.
 				alarm1 = 20 + irandom(20);
 				
-				// this makes them do that !!! notice before attacking, you don't need this. Add this for attacks that would be annoying without it.
-				instance_create(x,y,AssassinNotice)
 				image_index = 0;
         		sprite_index = spr_fire;
+        		
 				charging = true;
 				charge_time = 40;
 				enemy_walk(target_direction + orandom(30), alarm1 - 10);
@@ -206,7 +214,20 @@
 		enemy_look(direction);
 	}
 	
+#define WoolyMaggot_hurt(_dmg, _spd, _dir)
+    
+    sprite_index = spr_hurt;
+	image_index  = 0;
+	
+    var _snd = sound_play_hit(sndPortalLightning1, 0.1);
+    audio_sound_gain(_snd, 0.7, 0);
+    audio_sound_set_track_position(_snd, 0.1);
+    audio_sound_gain(sound_play_hit(sndMaggotBite, 2), 2, 0.2);
+    
+    nexthurt   = current_frame + 6;
+	my_health -= _dmg;
 
+    
 //#region GENERIC FUNCTIONS
 
 
@@ -240,7 +261,11 @@
 #define GunEnemy_draw                               											if gunangle < 180{ draw_sprite_ext(spr_weap,0,x + lengthdir_x(-wkick,gunangle), y + lengthdir_y(-wkick, gunangle), 1, right, gunangle, image_blend, image_alpha);} draw_sprite_ext(sprite_index,image_index,x,y,image_xscale * right, image_yscale, image_angle, image_blend, image_alpha); if gunangle >= 180{ draw_sprite_ext(spr_weap,0,x + lengthdir_x(-wkick,gunangle), y + lengthdir_y(-wkick, gunangle), 1, right, gunangle, image_blend, image_alpha);}
 #define MeleeEnemy_draw																			if(gunangle <= 180) draw_weapon(spr_weap, 0, x, y, gunangle, wepangle, wkick, 1, image_blend, image_alpha); image_xscale *= right; draw_self(); image_xscale /= right; if(gunangle >  180) draw_weapon(spr_weap, 0, x, y, gunangle, wepangle, wkick, 1, image_blend, image_alpha);
 #define StandardDrops                           												pickup_drop(40, 10, 2);
-
+#define LowDrops                           														pickup_drop(40, 0, 2);
+#define draw_bloom
+    with(instances_matching_gt([CustomProjectile, CustomObject, CustomSlash, CustomEnemy], "fff_bloomamount", 0)){
+        draw_sprite_ext(sprite_index, image_index, x, y, fff_bloomamount*image_xscale,  fff_bloomamount*image_yscale, image_angle, image_blend,  fff_bloomtransparency);
+    }
 #define nothing
 //not one thing!
 
