@@ -95,6 +95,8 @@
         gunangle      = 180;
         fff_bloomamount = 0;
         fff_bloomtransparency = 0.1;
+        
+        snd_dead = sndMaggotSpawnDie;
 
         // setting your alarm amounts here is basically just how quickly they can attack after spawning, usually just keep it at this amount.
         // if you need something to be able to attack RIGHT after spawning set it to like 10 or something.
@@ -139,9 +141,7 @@
        
         charge_time -= current_time_scale;
   
-		fff_bloomamount = 1.7;
-		
-		sound_play_pitchvol(sndLightningReload, 0.5, 5);
+		fff_bloomamount = 1.5;
         
         with instance_create(x, y, PlasmaTrail){
 		sprite_index = global.sprStaticTrail;
@@ -193,6 +193,7 @@
 				image_index = 0;
         		sprite_index = spr_fire;
         		
+        		sound_play_pitchvol(sndLightningCannonEnd, 2, 0.5);
 				charging = true;
 				charge_time = 40;
 				enemy_walk(target_direction + orandom(30), alarm1 - 10);
@@ -222,12 +223,12 @@
     var _snd = sound_play_hit(sndPortalLightning1, 0.1);
     audio_sound_gain(_snd, 0.7, 0);
     audio_sound_set_track_position(_snd, 0.1);
-    audio_sound_gain(sound_play_hit(sndMaggotBite, 2), 2, 0.2);
+    audio_sound_gain(sound_play_hit(sndMaggotBite, 1.5), 1.5, 0.2);
     
     nexthurt   = current_frame + 6;
 	my_health -= _dmg;
 
-    
+
 //#region GENERIC FUNCTIONS
 
 
@@ -295,8 +296,6 @@
 	
 	nexthurt   = current_frame + 6;
 	my_health -= _dmg;
-
-
 
 
 //Snatched from TE
