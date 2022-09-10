@@ -188,7 +188,7 @@
 			if(chance(3, 4) and (target_distance > 32)){
 			    
 			    // set the attack timer here if you want to have a different timer from the walkin and such.
-				alarm1 = 20 + irandom(20);
+				alarm1 = 60 + irandom(30);
 				
 				image_index = 0;
         		sprite_index = spr_fire;
@@ -197,6 +197,7 @@
 				charging = true;
 				charge_time = 40;
 				enemy_walk(target_direction + orandom(30), alarm1 - 10);
+				
 		
 			}
 			
