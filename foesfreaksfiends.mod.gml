@@ -42,7 +42,7 @@
     
     if button_pressed(0,"horn"){
 	repeat(1){
-	WoolyMaggot_create(mouse_x,mouse_y);
+	BigWoolyMaggot_create(mouse_x,mouse_y);
 	    }
     } 
 
@@ -235,11 +235,12 @@
     	
         // this is where you'll set your sprites and such, nts_color_blood isn't needed but makes it work with various blood mods, so its just nice to add.
         // Visuals:
-        spr_idle = global.sprWoolyMaggotIdle;
-		spr_walk = global.sprWoolyMaggotIdle;
-		spr_hurt = global.sprWoolyMaggotHurt
-		spr_dead = global.sprWoolyMaggotDead;
-		spr_fire = global.sprWoolyMaggotCharge;
+        spr_idle = sprBigMaggotIdle;
+		spr_walk = sprBigMaggotIdle;
+		spr_hurt = sprBigMaggotHurt;
+		spr_dead = sprBigMaggotDead;
+		spr_appear = sprBigMaggotAppear;
+		spr_burrow = sprBigMaggotBurrow;
 	
 		
 		sprite_index    = spr_idle;
@@ -286,11 +287,11 @@
         // Alrm1 is where you'll set your actual attacks, you can have more than one alarm but the majority of enemies dont need them and I dont feel like explaining it.
         
         //Scripts:
-        on_step  = script_ref_create(WoolyMaggot_step);
+        on_step  = script_ref_create(BigWoolyMaggot_step);
         on_draw  = BasicEnemy_draw;
         on_hurt  = WoolyMaggot_hurt;
         on_death = LowDrops;
-        on_alrm1 = script_ref_create(WoolyMaggot_alrm1);
+        on_alrm1 = script_ref_create(BigWoolyMaggot_alrm1);
         
         return self;
 	}
@@ -312,29 +313,8 @@
 	if(speed > maxspeed){ speed = maxspeed; }
 	
 		  // Animate:
-   if (charging == true){
-        maxspeed = chargespeed;
-       
-        charge_time -= current_time_scale;
-  
-		fff_bloomamount = 1.5;
-        
-        with instance_create(x, y, PlasmaTrail){
-		sprite_index = global.sprStaticTrail;
-		}
-    
-    	if (charge_time <= 0) {
-        charging = false;
-		}
-    }
-    if(anim_end){
-		    if (!charging) {
-		    	maxspeed = walkspeed;
-		    	fff_bloomamount = 0;
-		    		
-		        sprite_index = enemy_sprite;
-		    }
-    	}	
+   sprite_index = enemy_sprite;
+	
 	
 		//Use Your Eyes:
 	right = (gunangle + 270) mod 360 > 180 ? 1 : -1;
@@ -365,13 +345,8 @@
 			    
 			    // set the attack timer here if you want to have a different timer from the walkin and such.
 				alarm1 = 60 + irandom(30);
-				
-				image_index = 0;
-        		sprite_index = spr_fire;
         		
         		sound_play_pitchvol(sndLightningCannonEnd, 2, 0.5);
-				charging = true;
-				charge_time = 40;
 				enemy_walk(target_direction + orandom(30), alarm1 - 10);
 				
 		
