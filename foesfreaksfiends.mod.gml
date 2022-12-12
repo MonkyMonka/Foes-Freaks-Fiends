@@ -380,21 +380,19 @@
     nexthurt   = current_frame + 6;
 	my_health -= _dmg;
 
-#define BigWoolyWorm_create(_x, _y)
+#define Thief_create(_x, _y)
 	with instance_create(_x, _y, CustomEnemy){
     	
     	// youll want to set the name here, both because I stuck it in hitid and for mod support
-    	name = "Big Wooly Maggot"
+    	name = "Thief"
     	
     	
         // this is where you'll set your sprites and such, nts_color_blood isn't needed but makes it work with various blood mods, so its just nice to add.
         // Visuals:
-        spr_idle = sprBigMaggotIdle;
-		spr_walk = sprBigMaggotIdle;
-		spr_hurt = sprBigMaggotHurt;
-		spr_dead = sprBigMaggotDead;
-		spr_appear = sprBigMaggotAppear;
-		spr_burrow = sprBigMaggotBurrow;
+        spr_idle = sprJungleBanditIdle;
+		spr_walk = sprJungleBanditWalk;
+		spr_hurt = sprJungleBanditHurt;
+		spr_dead = sprJungleBanditDead;
 	
 		
 		sprite_index    = spr_idle;
@@ -441,16 +439,16 @@
         // Alrm1 is where you'll set your actual attacks, you can have more than one alarm but the majority of enemies dont need them and I dont feel like explaining it.
         
         //Scripts:
-        on_step  = script_ref_create(BigWoolyWorm_step);
+        on_step  = script_ref_create(Thief_step);
         on_draw  = BasicEnemy_draw;
         on_hurt  = WoolyMaggot_hurt;
         on_death = LowDrops;
-        on_alrm1 = script_ref_create(BigWoolyWorm_alrm1);
+        on_alrm1 = script_ref_create(Thief_alrm1);
         
         return self;
 	}
 
-#define BigWoolyWorm_step
+#define Thief_step
 
     // surprise surprise its actually really simple in this step to the point you probably don't need to touch this.
     // this is just some simple stuff that sets sprites and handles alarms and speed, only touch this if you have extra sprites like charging or whatever.
@@ -473,7 +471,7 @@
 		//Use Your Eyes:
 	right = (gunangle + 270) mod 360 > 180 ? 1 : -1;
 
-#define BigWoolyWorm_alrm1
+#define Thief_alrm1
 
     // setting the alarm here is basically just resetting the attack/movement timer.
     // making it set a larger number will make there be a longer delay, think of it just as a timer that ticks down, because thats what it is.
@@ -521,7 +519,7 @@
 		enemy_look(direction);
 	}
 	
-#define BigWoolyWorm_hurt(_dmg, _spd, _dir)
+#define Thief_hurt(_dmg, _spd, _dir)
     
     sprite_index = spr_hurt;
 	image_index  = 0;
