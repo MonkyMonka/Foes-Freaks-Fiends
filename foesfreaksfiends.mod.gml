@@ -9,8 +9,13 @@
 		global.sprWoolyMaggotCharge = sprite_add("sprites/WoolyMaggotFamily/WoolyMaggot/sprWoolyMaggotCharge.png", 5, 8, 8);
 		global.sprStaticTrail = sprite_add("sprites/WoolyMaggotFamily/WoolyMaggot/sprStaticTrail.png", 3, 4, 4);
 		//Big Wooly Maggot Sprites:
-		//Wooly Maggot Sprites:
-		//Wooly Maggot Sprites:
+		//Wooly Worm Sprites:
+		//Thief Sprites:
+		//Rat Canister Sprites:
+		global.sprRatCanisterIdle = sprite_add("sprites/RatCanister/sprRatCanisterIdle.png", 4, 8, 8);
+		global.sprRatCanisterHurt = sprite_add("sprites/RatCanister/sprRatCanisterHurt.png", 4, 8, 8);
+		global.sprRatCanisterDead = sprite_add("sprites/RatCanister/sprRatCanisterDead.png", 4, 8, 8);
+		global.sprRatCanisterWalk = sprite_add("sprites/RatCanister/sprRatCanisterWalk.png", 4, 8, 8);
 
 #define step 
     
@@ -44,7 +49,7 @@
     
     if button_pressed(0,"horn"){
 	repeat(1){
-	BigWoolyMaggot_create(mouse_x,mouse_y);
+	RatCanister_create(mouse_x,mouse_y);
 	    }
     } 
 
@@ -255,13 +260,11 @@
         
         // this is where you change your enemy's stats and add any needed variables, most should be self explanatory but if you need help ask.
         // Vars:
-        mask_index    = mskMaggot;
+        mask_index    = mskBigMaggot;
         direction     = random(360);
-        maxhealth     = 4;
+        maxhealth     = 22;
        	my_health     = maxhealth;
-        raddrop       = 2;
-        charge_time = 0;
-        chargespeed   = 5;
+        raddrop       = 10;
         maxspeed      = 2.5;
         walkspeed     = maxspeed;
         charging	  = false;
@@ -292,7 +295,7 @@
         on_step  = script_ref_create(BigWoolyMaggot_step);
         on_draw  = BasicEnemy_draw;
         on_hurt  = BigWoolyMaggot_hurt;
-        on_death = LowDrops;
+        on_death = StandardDrops;
         on_alrm1 = script_ref_create(BigWoolyMaggot_alrm1);
         
         return self;
@@ -381,11 +384,12 @@
     
     nexthurt   = current_frame + 6;
 	my_health -= _dmg;
+	
 #define WoolyWorm_create(_x, _y)
 	with instance_create(_x, _y, CustomEnemy){
     	
     	// youll want to set the name here, both because I stuck it in hitid and for mod support
-    	name = "Big Wooly Maggot"
+    	name = "Wooly Worm Maggot"
     	
     	
         // this is where you'll set your sprites and such, nts_color_blood isn't needed but makes it work with various blood mods, so its just nice to add.
@@ -394,8 +398,8 @@
 		spr_walk = sprBigMaggotIdle;
 		spr_hurt = sprBigMaggotHurt;
 		spr_dead = sprBigMaggotDead;
-		spr_appear = sprBigMaggotAppear;
-		spr_burrow = sprBigMaggotBurrow;
+		spr_fly = sprJungleFlyWalk;
+		spr_puke =sprJungleFlyIdle;
 	
 		
 		sprite_index    = spr_idle;
@@ -410,16 +414,13 @@
         // Vars:
         mask_index    = mskMaggot;
         direction     = random(360);
-        maxhealth     = 4;
+        maxhealth     = 70;
        	my_health     = maxhealth;
-        raddrop       = 2;
-        charge_time = 0;
-        chargespeed   = 5;
+        raddrop       = 13;
         maxspeed      = 2.5;
         walkspeed     = maxspeed;
-        charging	  = false;
         canmelee      = 1;
-        meleedamage   = 2;
+        meleedamage   = 3;
         team          = 1;
         targetvisible = 0;
         target        = 0;
@@ -445,7 +446,7 @@
         on_step  = script_ref_create(WoolyWorm_step);
         on_draw  = BasicEnemy_draw;
         on_hurt  = WoolyWorm_hurt;
-        on_death = LowDrops;
+        on_death = StandardDrops;
         on_alrm1 = script_ref_create(WoolyWorm_alrm1);
         
         return self;
@@ -686,6 +687,8 @@
     
     nexthurt   = current_frame + 6;
 	my_health -= _dmg;
+	
+//#region SEWERS:
 #define RatCanister_create(_x, _y)
 	with instance_create(_x, _y, CustomEnemy){
     	
@@ -695,10 +698,10 @@
     	
         // this is where you'll set your sprites and such, nts_color_blood isn't needed but makes it work with various blood mods, so its just nice to add.
         // Visuals:
-        spr_idle = sprJungleBanditIdle;
-		spr_walk = sprJungleBanditWalk;
-		spr_hurt = sprJungleBanditHurt;
-		spr_dead = sprJungleBanditDead;
+        spr_idle = global.sprRatCanisterIdle;
+		spr_walk = global.sprRatCanisterWalk;
+		spr_hurt = global.sprRatCanisterHurt;
+		spr_dead = global.sprRatCanisterDead;
 	
 		
 		sprite_index    = spr_idle;
@@ -711,16 +714,13 @@
         
         // this is where you change your enemy's stats and add any needed variables, most should be self explanatory but if you need help ask.
         // Vars:
-        mask_index    = mskMaggot;
+        mask_index    = mskRat;
         direction     = random(360);
-        maxhealth     = 4;
+        maxhealth     = 24;
        	my_health     = maxhealth;
-        raddrop       = 2;
-        charge_time = 0;
-        chargespeed   = 5;
+        raddrop       = 20;
         maxspeed      = 2.5;
         walkspeed     = maxspeed;
-        charging	  = false;
         canmelee      = 1;
         meleedamage   = 2;
         team          = 1;
@@ -731,7 +731,7 @@
         fff_bloomamount = 0;
         fff_bloomtransparency = 0.1;
         
-        snd_dead = sndMaggotSpawnDie;
+        snd_dead = sndRatDie;
 
         // setting your alarm amounts here is basically just how quickly they can attack after spawning, usually just keep it at this amount.
         // if you need something to be able to attack RIGHT after spawning set it to like 10 or something.
@@ -830,10 +830,10 @@
     sprite_index = spr_hurt;
 	image_index  = 0;
 	
-    var _snd = sound_play_hit(sndPortalLightning1, 0.1);
+    var _snd = sound_play_hit(sndConfetti1, 0.1);
     audio_sound_gain(_snd, 0.7, 0);
     audio_sound_set_track_position(_snd, 0.1);
-    audio_sound_gain(sound_play_hit(sndMaggotBite, 1.5), 1.5, 0.2);
+    audio_sound_gain(sound_play_hit(sndRatHit, 1.5), 1.5, 0.2);
     
     nexthurt   = current_frame + 6;
 	my_health -= _dmg;
