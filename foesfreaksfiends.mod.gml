@@ -12,10 +12,10 @@
 		//Wooly Worm Sprites:
 		//Thief Sprites:
 		//Rat Canister Sprites:
-		global.sprRatCanisterIdle = sprite_add("sprites/RatCanister/sprRatCanisterIdle.png", 4, 8, 8);
-		global.sprRatCanisterHurt = sprite_add("sprites/RatCanister/sprRatCanisterHurt.png", 4, 8, 8);
-		global.sprRatCanisterDead = sprite_add("sprites/RatCanister/sprRatCanisterDead.png", 4, 8, 8);
-		global.sprRatCanisterWalk = sprite_add("sprites/RatCanister/sprRatCanisterWalk.png", 4, 8, 8);
+		global.sprRatCanisterIdle = sprite_add("sprites/RatCanister/sprRatCanisterIdle.png", 4, 12, 12);
+		global.sprRatCanisterHurt = sprite_add("sprites/RatCanister/sprRatCanisterHurt.png", 3, 12, 12);
+		global.sprRatCanisterDead = sprite_add("sprites/RatCanister/sprRatCanisterDead.png", 6, 12, 12);
+		global.sprRatCanisterWalk = sprite_add("sprites/RatCanister/sprRatCanisterWalk.png", 6, 24, 12);
 
 #define step 
     
@@ -708,7 +708,7 @@
 		image_speed     = 0.4;
 		depth           = -2;
 		hitid           = [spr_idle, name]
-        spr_shadow      = shd16;	
+        spr_shadow      = shd24;
         nts_color_blood = [c_red, make_color_rgb(134, 44, 35)]
         
         
