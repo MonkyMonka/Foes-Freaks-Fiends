@@ -18,10 +18,10 @@
 		global.sprRatCanisterWalk = sprite_add("sprites/RatCanister/sprRatCanisterWalk.png", 6, 24, 12);
 		//Javlineer Bandit Sprites:
 		global.sprJavlineerBanditIdle = sprite_add("sprites/EliteBandits/JavelineerBandit/sprJavlineerBanditIdle.png", 4, 12, 12);
+		global.sprJavlineerBanditHurt = sprite_add("sprites/EliteBandits/JavelineerBandit/sprJavlineerBanditHurt.png", 3, 12, 12);
 		global.sprJavlineerBanditDead = sprite_add("sprites/EliteBandits/JavelineerBandit/sprJavlineerBanditDead.png", 6, 12, 12);
-		global.sprJavlineerBanditFire = sprite_add("sprites/EliteBandits/JavelineerBandit/sprJavlineerBanditFire.png", 3, 12, 12);
 		global.sprJavlineerBanditWalk = sprite_add("sprites/EliteBandits/JavelineerBandit/sprJavlineerBanditWalk.png", 6, 12, 12);
-		
+		global.sprJavlineerBanditFire = sprite_add("sprites/EliteBandits/JavelineerBandit/sprJavlineerBanditFire.png", 3, 12, 12);
 
 #define step 
     
@@ -55,7 +55,7 @@
     
     if button_pressed(0,"horn"){
 	repeat(1){
-	RatCanister_create(mouse_x,mouse_y);
+	JavlineerBandit_create(mouse_x,mouse_y);
 	    }
     } 
 
@@ -71,8 +71,9 @@
         // Visuals:
         spr_idle = global.sprJavlineerBanditIdle;
 		spr_walk = global.sprJavlineerBanditWalk;
-		spr_hurt = global.sprJavlineerBanditDead;
+		spr_hurt = global.sprJavlineerBanditHurt;
 		spr_dead = global.sprJavlineerBanditDead;
+		spr_fire = global.sprJavlineerBanditFire;
 	
 		
 		sprite_index    = spr_idle;
@@ -94,6 +95,8 @@
         walkspeed     = maxspeed;
         canmelee      = 1;
         meleedamage   = 2;
+        throw_time = 0;
+        throwing = false;
         team          = 1;
         targetvisible = 0;
         target        = 0;
@@ -142,8 +145,18 @@
 	if(speed > maxspeed){ speed = maxspeed; }
 	
 		  // Animate:
-   sprite_index = enemy_sprite;
-	
+   if (throwing == true){
+        throw_time -= current_time_scale;
+		}
+    
+    	if (throw_time <= 0) {
+        throwing = false;
+    	}
+    if(anim_end){
+		    if (!throwing) {
+		        sprite_index = enemy_sprite;
+		    }
+    	}	
 	
 		//Use Your Eyes:
 	right = (gunangle + 270) mod 360 > 180 ? 1 : -1;
@@ -175,9 +188,13 @@
 			    // set the attack timer here if you want to have a different timer from the walkin and such.
 				alarm1 = 60 + irandom(30);
         		
+        		image_index = 0;
+        		sprite_index = spr_fire;
+        		
         		sound_play_pitchvol(sndLightningCannonEnd, 2, 0.5);
+				throwing = true;
+				throw_time = 40;
 				enemy_walk(target_direction + orandom(30), alarm1 - 10);
-				
 		
 			}
 			
