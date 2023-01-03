@@ -16,6 +16,12 @@
 		global.sprRatCanisterHurt = sprite_add("sprites/RatCanister/sprRatCanisterHurt.png", 3, 12, 12);
 		global.sprRatCanisterDead = sprite_add("sprites/RatCanister/sprRatCanisterDead.png", 6, 12, 12);
 		global.sprRatCanisterWalk = sprite_add("sprites/RatCanister/sprRatCanisterWalk.png", 6, 24, 12);
+		//Javlineer Bandit Sprites:
+		global.sprJavlineerBanditIdle = sprite_add("sprites/EliteBandits/JavelineerBandit/sprJavlineerBanditIdle.png", 4, 12, 12);
+		global.sprJavlineerBanditDead = sprite_add("sprites/EliteBandits/JavelineerBandit/sprJavlineerBanditDead.png", 6, 12, 12);
+		global.sprJavlineerBanditFire = sprite_add("sprites/EliteBandits/JavelineerBandit/sprJavlineerBanditFire.png", 3, 12, 12);
+		global.sprJavlineerBanditWalk = sprite_add("sprites/EliteBandits/JavelineerBandit/sprJavlineerBanditWalk.png", 6, 12, 12);
+		
 
 #define step 
     
@@ -52,6 +58,306 @@
 	RatCanister_create(mouse_x,mouse_y);
 	    }
     } 
+
+//#region DESERT:
+#define JavlineerBandit_create(_x, _y)
+	with instance_create(_x, _y, CustomEnemy){
+    	
+    	// youll want to set the name here, both because I stuck it in hitid and for mod support
+    	name = "Javlineer Bandit"
+    	
+    	
+        // this is where you'll set your sprites and such, nts_color_blood isn't needed but makes it work with various blood mods, so its just nice to add.
+        // Visuals:
+        spr_idle = global.sprJavlineerBanditIdle;
+		spr_walk = global.sprJavlineerBanditWalk;
+		spr_hurt = global.sprJavlineerBanditDead;
+		spr_dead = global.sprJavlineerBanditDead;
+	
+		
+		sprite_index    = spr_idle;
+		image_speed     = 0.4;
+		depth           = -2;
+		hitid           = [spr_idle, name]
+        spr_shadow      = shd24;
+        nts_color_blood = [c_red, make_color_rgb(134, 44, 35)]
+        
+        
+        // this is where you change your enemy's stats and add any needed variables, most should be self explanatory but if you need help ask.
+        // Vars:
+        mask_index    = mskRat;
+        direction     = random(360);
+        maxhealth     = 24;
+       	my_health     = maxhealth;
+        raddrop       = 20;
+        maxspeed      = 2.5;
+        walkspeed     = maxspeed;
+        canmelee      = 1;
+        meleedamage   = 2;
+        team          = 1;
+        targetvisible = 0;
+        target        = 0;
+        walk          = 0;
+        gunangle      = 180;
+        fff_bloomamount = 0;
+        fff_bloomtransparency = 0.1;
+        
+        snd_dead = sndRatDie;
+
+        // setting your alarm amounts here is basically just how quickly they can attack after spawning, usually just keep it at this amount.
+        // if you need something to be able to attack RIGHT after spawning set it to like 10 or something.
+        // Alarms:
+        alarm1 = 20 + irandom(30);
+
+        // set you stuff in here, I have some generic things to set, scroll to the bottom of the file to see them if you want.
+        // GunEnemy_draw is for drawing an enemy that wields a ranged weapon, theres also BasicEnemy_draw (no weapon) and MeleeEnemy_draw (melee weapon) in this file.
+        // Enemy_hurt is just a standard enemy hurt function, replace it if you want a special on_hurt effect.
+        // StandardDrops drops what is pretty much a 'Normal' amount of pickups.
+        // Alrm1 is where you'll set your actual attacks, you can have more than one alarm but the majority of enemies dont need them and I dont feel like explaining it.
+        
+        //Scripts:
+        on_step  = script_ref_create(JavlineerBandit_step);
+        on_draw  = BasicEnemy_draw;
+        on_hurt  = JavlineerBandit_hurt;
+        on_death = LowDrops;
+        on_alrm1 = script_ref_create(JavlineerBandit_alrm1);
+        
+        return self;
+	}
+
+#define JavlineerBandit_step
+
+    // surprise surprise its actually really simple in this step to the point you probably don't need to touch this.
+    // this is just some simple stuff that sets sprites and handles alarms and speed, only touch this if you have extra sprites like charging or whatever.
+    // ask me if you think something needs to go in here, if you're making like, a bandit, it shouldn't need to change this.
+
+	 // Alarms:
+	if("on_alrm0" in self and alarm0_run) exit;
+	if("on_alrm1" in self and alarm1_run) exit;
+
+		// Movement:
+	if(walk > 0){ walk -= current_time_scale;   speed += walkspeed * current_time_scale;   gunangle = direction }
+	
+		//Speed Cap:
+	if(speed > maxspeed){ speed = maxspeed; }
+	
+		  // Animate:
+   sprite_index = enemy_sprite;
+	
+	
+		//Use Your Eyes:
+	right = (gunangle + 270) mod 360 > 180 ? 1 : -1;
+
+#define JavlineerBandit_alrm1
+
+    // setting the alarm here is basically just resetting the attack/movement timer.
+    // making it set a larger number will make there be a longer delay, think of it just as a timer that ticks down, because thats what it is.
+	alarm1 = 40 + irandom(30);
+
+             // makes the enemy look at that dastardly fella.
+	if(enemy_target(x, y) and target_visible) {
+		enemy_look(target_direction);
+		
+		    // This makes the enemy walk towards it's target if its too far away.
+		if(target_distance > 128){
+			alarm1 = 30 + irandom(15);
+			enemy_walk(target_direction + orandom(30), alarm1 - 10);
+		}
+			 // Checks if within range before attacking, most enemies don't actually check for range and just attack at any distance.
+		if(target_distance < 128){
+			 // Attack:
+			 // this check makes their attacks a bit more random, and makes sure they're not too close to the target, remove this if you want.
+			 // MOST enemies in the game have a behavorior like this, including short range enemies like gators.
+			 // if you dont believe me spawn some snipers or gators and stand right next to them, theyll just try and move away instead of shooting.
+			 
+			if(chance(3, 4) and (target_distance > 32)){
+			    
+			    // set the attack timer here if you want to have a different timer from the walkin and such.
+				alarm1 = 60 + irandom(30);
+        		
+        		sound_play_pitchvol(sndLightningCannonEnd, 2, 0.5);
+				enemy_walk(target_direction + orandom(30), alarm1 - 10);
+				
+		
+			}
+			
+			         // this makes em move away if too close, see where this connects to the target distance check above.
+					 // Move Away From Target:
+			else{
+				alarm1 = 30 + irandom(15);
+				enemy_walk(gunangle + 180 + orandom(30), alarm1 - 10);
+			}
+		}
+	}
+	    // just walk around like an idiot if you aren't doing anything better
+	 // Wander Around Town:
+	else{
+		enemy_walk(random(360), 30);
+		enemy_look(direction);
+	}
+	
+#define JavlineerBandit_hurt(_dmg, _spd, _dir)
+    
+    sprite_index = spr_hurt;
+	image_index  = 0;
+	
+    var _snd = sound_play_hit(sndConfetti1, 0.1);
+    audio_sound_gain(_snd, 0.7, 0);
+    audio_sound_set_track_position(_snd, 0.1);
+    audio_sound_gain(sound_play_hit(sndRatHit, 1.5), 1.5, 0.2);
+    
+    nexthurt   = current_frame + 6;
+	my_health -= _dmg;
+
+//#region SEWERS:
+#define RatCanister_create(_x, _y)
+	with instance_create(_x, _y, CustomEnemy){
+    	
+    	// youll want to set the name here, both because I stuck it in hitid and for mod support
+    	name = "Rat Canister"
+    	
+    	
+        // this is where you'll set your sprites and such, nts_color_blood isn't needed but makes it work with various blood mods, so its just nice to add.
+        // Visuals:
+        spr_idle = global.sprRatCanisterIdle;
+		spr_walk = global.sprRatCanisterWalk;
+		spr_hurt = global.sprRatCanisterHurt;
+		spr_dead = global.sprRatCanisterDead;
+	
+		
+		sprite_index    = spr_idle;
+		image_speed     = 0.4;
+		depth           = -2;
+		hitid           = [spr_idle, name]
+        spr_shadow      = shd24;
+        nts_color_blood = [c_red, make_color_rgb(134, 44, 35)]
+        
+        
+        // this is where you change your enemy's stats and add any needed variables, most should be self explanatory but if you need help ask.
+        // Vars:
+        mask_index    = mskRat;
+        direction     = random(360);
+        maxhealth     = 24;
+       	my_health     = maxhealth;
+        raddrop       = 20;
+        maxspeed      = 2.5;
+        walkspeed     = maxspeed;
+        canmelee      = 1;
+        meleedamage   = 2;
+        team          = 1;
+        targetvisible = 0;
+        target        = 0;
+        walk          = 0;
+        gunangle      = 180;
+        fff_bloomamount = 0;
+        fff_bloomtransparency = 0.1;
+        
+        snd_dead = sndRatDie;
+
+        // setting your alarm amounts here is basically just how quickly they can attack after spawning, usually just keep it at this amount.
+        // if you need something to be able to attack RIGHT after spawning set it to like 10 or something.
+        // Alarms:
+        alarm1 = 20 + irandom(30);
+
+        // set you stuff in here, I have some generic things to set, scroll to the bottom of the file to see them if you want.
+        // GunEnemy_draw is for drawing an enemy that wields a ranged weapon, theres also BasicEnemy_draw (no weapon) and MeleeEnemy_draw (melee weapon) in this file.
+        // Enemy_hurt is just a standard enemy hurt function, replace it if you want a special on_hurt effect.
+        // StandardDrops drops what is pretty much a 'Normal' amount of pickups.
+        // Alrm1 is where you'll set your actual attacks, you can have more than one alarm but the majority of enemies dont need them and I dont feel like explaining it.
+        
+        //Scripts:
+        on_step  = script_ref_create(RatCanister_step);
+        on_draw  = BasicEnemy_draw;
+        on_hurt  = RatCanister_hurt;
+        on_death = LowDrops;
+        on_alrm1 = script_ref_create(RatCanister_alrm1);
+        
+        return self;
+	}
+
+#define RatCanister_step
+
+    // surprise surprise its actually really simple in this step to the point you probably don't need to touch this.
+    // this is just some simple stuff that sets sprites and handles alarms and speed, only touch this if you have extra sprites like charging or whatever.
+    // ask me if you think something needs to go in here, if you're making like, a bandit, it shouldn't need to change this.
+
+	 // Alarms:
+	if("on_alrm0" in self and alarm0_run) exit;
+	if("on_alrm1" in self and alarm1_run) exit;
+
+		// Movement:
+	if(walk > 0){ walk -= current_time_scale;   speed += walkspeed * current_time_scale;   gunangle = direction }
+	
+		//Speed Cap:
+	if(speed > maxspeed){ speed = maxspeed; }
+	
+		  // Animate:
+   sprite_index = enemy_sprite;
+	
+	
+		//Use Your Eyes:
+	right = (gunangle + 270) mod 360 > 180 ? 1 : -1;
+
+#define RatCanister_alrm1
+
+    // setting the alarm here is basically just resetting the attack/movement timer.
+    // making it set a larger number will make there be a longer delay, think of it just as a timer that ticks down, because thats what it is.
+	alarm1 = 40 + irandom(30);
+
+             // makes the enemy look at that dastardly fella.
+	if(enemy_target(x, y) and target_visible) {
+		enemy_look(target_direction);
+		
+		    // This makes the enemy walk towards it's target if its too far away.
+		if(target_distance > 128){
+			alarm1 = 30 + irandom(15);
+			enemy_walk(target_direction + orandom(30), alarm1 - 10);
+		}
+			 // Checks if within range before attacking, most enemies don't actually check for range and just attack at any distance.
+		if(target_distance < 128){
+			 // Attack:
+			 // this check makes their attacks a bit more random, and makes sure they're not too close to the target, remove this if you want.
+			 // MOST enemies in the game have a behavorior like this, including short range enemies like gators.
+			 // if you dont believe me spawn some snipers or gators and stand right next to them, theyll just try and move away instead of shooting.
+			 
+			if(chance(3, 4) and (target_distance > 32)){
+			    
+			    // set the attack timer here if you want to have a different timer from the walkin and such.
+				alarm1 = 60 + irandom(30);
+        		
+        		sound_play_pitchvol(sndLightningCannonEnd, 2, 0.5);
+				enemy_walk(target_direction + orandom(30), alarm1 - 10);
+				
+		
+			}
+			
+			         // this makes em move away if too close, see where this connects to the target distance check above.
+					 // Move Away From Target:
+			else{
+				alarm1 = 30 + irandom(15);
+				enemy_walk(gunangle + 180 + orandom(30), alarm1 - 10);
+			}
+		}
+	}
+	    // just walk around like an idiot if you aren't doing anything better
+	 // Wander Around Town:
+	else{
+		enemy_walk(random(360), 30);
+		enemy_look(direction);
+	}
+	
+#define RatCanister_hurt(_dmg, _spd, _dir)
+    
+    sprite_index = spr_hurt;
+	image_index  = 0;
+	
+    var _snd = sound_play_hit(sndConfetti1, 0.1);
+    audio_sound_gain(_snd, 0.7, 0);
+    audio_sound_set_track_position(_snd, 0.1);
+    audio_sound_gain(sound_play_hit(sndRatHit, 1.5), 1.5, 0.2);
+    
+    nexthurt   = current_frame + 6;
+	my_health -= _dmg;
 
 //#region FROZEN CITY:
 #define WoolyMaggot_create(_x, _y)
@@ -536,6 +842,7 @@
     nexthurt   = current_frame + 6;
 	my_health -= _dmg;
 
+//#region MISC:
 #define Thief_create(_x, _y)
 	with instance_create(_x, _y, CustomEnemy){
     	
@@ -566,11 +873,8 @@
         maxhealth     = 4;
        	my_health     = maxhealth;
         raddrop       = 2;
-        charge_time = 0;
-        chargespeed   = 5;
         maxspeed      = 2.5;
         walkspeed     = maxspeed;
-        charging	  = false;
         canmelee      = 1;
         meleedamage   = 2;
         team          = 1;
@@ -688,157 +992,6 @@
     nexthurt   = current_frame + 6;
 	my_health -= _dmg;
 	
-//#region SEWERS:
-#define RatCanister_create(_x, _y)
-	with instance_create(_x, _y, CustomEnemy){
-    	
-    	// youll want to set the name here, both because I stuck it in hitid and for mod support
-    	name = "Rat Canister"
-    	
-    	
-        // this is where you'll set your sprites and such, nts_color_blood isn't needed but makes it work with various blood mods, so its just nice to add.
-        // Visuals:
-        spr_idle = global.sprRatCanisterIdle;
-		spr_walk = global.sprRatCanisterWalk;
-		spr_hurt = global.sprRatCanisterHurt;
-		spr_dead = global.sprRatCanisterDead;
-	
-		
-		sprite_index    = spr_idle;
-		image_speed     = 0.4;
-		depth           = -2;
-		hitid           = [spr_idle, name]
-        spr_shadow      = shd24;
-        nts_color_blood = [c_red, make_color_rgb(134, 44, 35)]
-        
-        
-        // this is where you change your enemy's stats and add any needed variables, most should be self explanatory but if you need help ask.
-        // Vars:
-        mask_index    = mskRat;
-        direction     = random(360);
-        maxhealth     = 24;
-       	my_health     = maxhealth;
-        raddrop       = 20;
-        maxspeed      = 2.5;
-        walkspeed     = maxspeed;
-        canmelee      = 1;
-        meleedamage   = 2;
-        team          = 1;
-        targetvisible = 0;
-        target        = 0;
-        walk          = 0;
-        gunangle      = 180;
-        fff_bloomamount = 0;
-        fff_bloomtransparency = 0.1;
-        
-        snd_dead = sndRatDie;
-
-        // setting your alarm amounts here is basically just how quickly they can attack after spawning, usually just keep it at this amount.
-        // if you need something to be able to attack RIGHT after spawning set it to like 10 or something.
-        // Alarms:
-        alarm1 = 20 + irandom(30);
-
-        // set you stuff in here, I have some generic things to set, scroll to the bottom of the file to see them if you want.
-        // GunEnemy_draw is for drawing an enemy that wields a ranged weapon, theres also BasicEnemy_draw (no weapon) and MeleeEnemy_draw (melee weapon) in this file.
-        // Enemy_hurt is just a standard enemy hurt function, replace it if you want a special on_hurt effect.
-        // StandardDrops drops what is pretty much a 'Normal' amount of pickups.
-        // Alrm1 is where you'll set your actual attacks, you can have more than one alarm but the majority of enemies dont need them and I dont feel like explaining it.
-        
-        //Scripts:
-        on_step  = script_ref_create(RatCanister_step);
-        on_draw  = BasicEnemy_draw;
-        on_hurt  = RatCanister_hurt;
-        on_death = LowDrops;
-        on_alrm1 = script_ref_create(RatCanister_alrm1);
-        
-        return self;
-	}
-
-#define RatCanister_step
-
-    // surprise surprise its actually really simple in this step to the point you probably don't need to touch this.
-    // this is just some simple stuff that sets sprites and handles alarms and speed, only touch this if you have extra sprites like charging or whatever.
-    // ask me if you think something needs to go in here, if you're making like, a bandit, it shouldn't need to change this.
-
-	 // Alarms:
-	if("on_alrm0" in self and alarm0_run) exit;
-	if("on_alrm1" in self and alarm1_run) exit;
-
-		// Movement:
-	if(walk > 0){ walk -= current_time_scale;   speed += walkspeed * current_time_scale;   gunangle = direction }
-	
-		//Speed Cap:
-	if(speed > maxspeed){ speed = maxspeed; }
-	
-		  // Animate:
-   sprite_index = enemy_sprite;
-	
-	
-		//Use Your Eyes:
-	right = (gunangle + 270) mod 360 > 180 ? 1 : -1;
-
-#define RatCanister_alrm1
-
-    // setting the alarm here is basically just resetting the attack/movement timer.
-    // making it set a larger number will make there be a longer delay, think of it just as a timer that ticks down, because thats what it is.
-	alarm1 = 40 + irandom(30);
-
-             // makes the enemy look at that dastardly fella.
-	if(enemy_target(x, y) and target_visible) {
-		enemy_look(target_direction);
-		
-		    // This makes the enemy walk towards it's target if its too far away.
-		if(target_distance > 128){
-			alarm1 = 30 + irandom(15);
-			enemy_walk(target_direction + orandom(30), alarm1 - 10);
-		}
-			 // Checks if within range before attacking, most enemies don't actually check for range and just attack at any distance.
-		if(target_distance < 128){
-			 // Attack:
-			 // this check makes their attacks a bit more random, and makes sure they're not too close to the target, remove this if you want.
-			 // MOST enemies in the game have a behavorior like this, including short range enemies like gators.
-			 // if you dont believe me spawn some snipers or gators and stand right next to them, theyll just try and move away instead of shooting.
-			 
-			if(chance(3, 4) and (target_distance > 32)){
-			    
-			    // set the attack timer here if you want to have a different timer from the walkin and such.
-				alarm1 = 60 + irandom(30);
-        		
-        		sound_play_pitchvol(sndLightningCannonEnd, 2, 0.5);
-				enemy_walk(target_direction + orandom(30), alarm1 - 10);
-				
-		
-			}
-			
-			         // this makes em move away if too close, see where this connects to the target distance check above.
-					 // Move Away From Target:
-			else{
-				alarm1 = 30 + irandom(15);
-				enemy_walk(gunangle + 180 + orandom(30), alarm1 - 10);
-			}
-		}
-	}
-	    // just walk around like an idiot if you aren't doing anything better
-	 // Wander Around Town:
-	else{
-		enemy_walk(random(360), 30);
-		enemy_look(direction);
-	}
-	
-#define RatCanister_hurt(_dmg, _spd, _dir)
-    
-    sprite_index = spr_hurt;
-	image_index  = 0;
-	
-    var _snd = sound_play_hit(sndConfetti1, 0.1);
-    audio_sound_gain(_snd, 0.7, 0);
-    audio_sound_set_track_position(_snd, 0.1);
-    audio_sound_gain(sound_play_hit(sndRatHit, 1.5), 1.5, 0.2);
-    
-    nexthurt   = current_frame + 6;
-	my_health -= _dmg;
-
-
 //#region GENERIC FUNCTIONS
 
 
