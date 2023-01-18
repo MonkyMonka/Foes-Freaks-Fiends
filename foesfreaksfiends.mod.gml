@@ -9,6 +9,11 @@
 		global.sprWoolyMaggotCharge = sprite_add("sprites/WoolyMaggotFamily/WoolyMaggot/sprWoolyMaggotCharge.png", 5, 8, 8);
 		global.sprStaticTrail = sprite_add("sprites/WoolyMaggotFamily/WoolyMaggot/sprStaticTrail.png", 3, 4, 4);
 		//Big Wooly Maggot Sprites:
+		global.sprBigWoolyMaggotIdle = sprite_add("sprites/WoolyMaggotFamily/BigWoolyMaggot/sprBigWoolyMaggotIdle.png", 6, 24, 16);
+		global.sprBigWoolyMaggotHurt = sprite_add("sprites/WoolyMaggotFamily/BigWoolyMaggot/sprBigWoolyMaggotIdle.png", 6, 24, 16);
+		global.sprBigWoolyMaggotDead = sprite_add("sprites/WoolyMaggotFamily/BigWoolyMaggot/sprBigWoolyMaggotIdle.png", 6, 24, 16);
+		global.sprBigWoolyMaggotAppear = sprite_add("sprites/WoolyMaggotFamily/BigWoolyMaggot/sprBigWoolyMaggotIdle.png", 6, 24, 16);
+		global.sprBigWoolyMaggotBurrow = sprite_add("sprites/WoolyMaggotFamily/BigWoolyMaggot/sprBigWoolyMaggotIdle.png", 6, 24, 16);
 		//Wooly Worm Sprites:
 		//Thief Sprites:
 		//Rat Canister Sprites:
@@ -55,7 +60,7 @@
     
     if button_pressed(0,"horn"){
 	repeat(1){
-	JavlineerBandit_create(mouse_x,mouse_y);
+	BigWoolyMaggot_create(mouse_x,mouse_y);
 	    }
     } 
 
@@ -565,25 +570,25 @@
     	
         // this is where you'll set your sprites and such, nts_color_blood isn't needed but makes it work with various blood mods, so its just nice to add.
         // Visuals:
-        spr_idle = sprBigMaggotIdle;
-		spr_walk = sprBigMaggotIdle;
-		spr_hurt = sprBigMaggotHurt;
-		spr_dead = sprBigMaggotDead;
-		spr_appear = sprBigMaggotAppear;
-		spr_burrow = sprBigMaggotBurrow;
+        spr_idle = global.sprBigWoolyMaggotIdle;
+		spr_walk = global.sprBigWoolyMaggotIdle;
+		spr_hurt = global.sprBigWoolyMaggotHurt;
+		spr_dead = global.sprBigWoolyMaggotDead;
+		spr_appear = global.sprBigWoolyMaggotAppear;
+		spr_burrow = global.sprBigWoolyMaggotBurrow;
 	
 		
 		sprite_index    = spr_idle;
 		image_speed     = 0.4;
 		depth           = -2;
 		hitid           = [spr_idle, name]
-        spr_shadow      = shd16;	
+        spr_shadow      = shd32;	
         nts_color_blood = [c_red, make_color_rgb(134, 44, 35)]
-        
+       
         
         // this is where you change your enemy's stats and add any needed variables, most should be self explanatory but if you need help ask.
         // Vars:
-        mask_index    = mskBigMaggot;
+        mask_index    = mskDogGuardian;
         direction     = random(360);
         maxhealth     = 22;
        	my_health     = maxhealth;
