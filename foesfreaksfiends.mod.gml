@@ -582,7 +582,9 @@
 		image_speed     = 0.4;
 		depth           = -2;
 		hitid           = [spr_idle, name]
-        spr_shadow      = shd32;	
+        spr_shadow      = shd64;	
+        spr_shadow_y	= -3;
+        spr_shadow_x	= -1;
         nts_color_blood = [c_red, make_color_rgb(134, 44, 35)]
        
         
@@ -606,7 +608,7 @@
         fff_bloomamount = 0;
         fff_bloomtransparency = 0.1;
         
-        snd_dead = sndMaggotSpawnDie;
+        snd_dead = sndBigMaggotDie;
 
         // setting your alarm amounts here is basically just how quickly they can attack after spawning, usually just keep it at this amount.
         // if you need something to be able to attack RIGHT after spawning set it to like 10 or something.
