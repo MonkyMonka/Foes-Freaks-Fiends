@@ -230,7 +230,7 @@
     
     nexthurt   = current_frame + 6;
 	my_health -= _dmg;
-
+//#endregion
 //#region SEWERS:
 #define RatCanister_create(_x, _y)
 	with instance_create(_x, _y, CustomEnemy){
@@ -380,7 +380,7 @@
     
     nexthurt   = current_frame + 6;
 	my_health -= _dmg;
-
+//#endregion
 //#region FROZEN CITY:
 #define WoolyMaggot_create(_x, _y)
 	with instance_create(_x, _y, CustomEnemy){
@@ -865,7 +865,7 @@
     
     nexthurt   = current_frame + 6;
 	my_health -= _dmg;
-
+//#endregion
 //#region MISC:
 #define Thief_create(_x, _y)
 	with instance_create(_x, _y, CustomEnemy){
@@ -1015,7 +1015,8 @@
     
     nexthurt   = current_frame + 6;
 	my_health -= _dmg;
-	
+
+//#endregion
 //#region GENERIC FUNCTIONS
 
 
