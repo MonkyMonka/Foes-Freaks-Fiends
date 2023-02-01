@@ -10,7 +10,7 @@
 		global.sprStaticTrail = sprite_add("sprites/WoolyMaggotFamily/WoolyMaggot/sprStaticTrail.png", 3, 4, 4);
 		//Big Wooly Maggot Sprites:
 		global.sprBigWoolyMaggotIdle = sprite_add("sprites/WoolyMaggotFamily/BigWoolyMaggot/sprBigWoolyMaggotIdle.png", 6, 24, 16);
-		global.sprBigWoolyMaggotHurt = sprite_add("sprites/WoolyMaggotFamily/BigWoolyMaggot/sprBigWoolyMaggotIdle.png", 6, 24, 16);
+		global.sprBigWoolyMaggotHurt = sprite_add("sprites/WoolyMaggotFamily/BigWoolyMaggot/sprBigWoolyMaggotHurt.png", 6, 24, 16);
 		global.sprBigWoolyMaggotDead = sprite_add("sprites/WoolyMaggotFamily/BigWoolyMaggot/sprBigWoolyMaggotIdle.png", 6, 24, 16);
 		global.sprBigWoolyMaggotAppear = sprite_add("sprites/WoolyMaggotFamily/BigWoolyMaggot/sprBigWoolyMaggotIdle.png", 6, 24, 16);
 		global.sprBigWoolyMaggotBurrow = sprite_add("sprites/WoolyMaggotFamily/BigWoolyMaggot/sprBigWoolyMaggotIdle.png", 6, 24, 16);
