@@ -27,7 +27,12 @@
 		global.sprJavlineerBanditDead = sprite_add("sprites/EliteBandits/JavelineerBandit/sprJavlineerBanditDead.png", 6, 12, 12);
 		global.sprJavlineerBanditWalk = sprite_add("sprites/EliteBandits/JavelineerBandit/sprJavlineerBanditWalk.png", 6, 12, 12);
 		global.sprJavlineerBanditFire = sprite_add("sprites/EliteBandits/JavelineerBandit/sprJavlineerBanditFire.png", 3, 12, 12);
-
+		
+		//Limousine Prop Sprites:
+		global.sprLimoPropIdle = sprite_add("sprites/Limousine/sprLimoPropIdle.png", 1, 19, 50);
+		global.sprLimoPropHurt = sprite_add("sprites/Limousine/sprLimoPropHurt.png", 3, 19, 50);
+		global.sprLimoPropGraffiti = sprite_add("sprites/Limousine/sprLimoPropGraffiti.png", 6, 19, 50);
+		global.mskLimoProp = sprite_add("sprites/Limousine/mskLimoProp.png", 1, 19, 50);
 #define step 
     
       // Level Start:
@@ -381,6 +386,44 @@
     nexthurt   = current_frame + 6;
 	my_health -= _dmg;
 //#endregion
+
+//#region VENUZ MANSION:
+#define LimoProp_create(_x, _y)
+	with(instance_create(_x, _y, CustomProp)){
+		 // Visual:
+		spr_idle	= global.sprLimoPropIdle;
+		spr_hurt	= global.sprLimoPropHurt;
+		spr_dead	= global.sprLimoPropHurt;
+		
+		spr_shadow = shd32;
+		spr_shadow_y = -1;
+		
+		image_xscale = 1;
+		depth = -5;
+		 // Sounds:
+		snd_hurt	= sndStatueHurt;
+		snd_dead	= sndStatueDead;
+		 // Vars:
+		name = "Limo Prop"
+		maxhealth	= 999999;
+		my_health	= maxhealth;
+		mask_index	= global.mskLimoProp
+		team		= 0;
+		
+		graffiti_frame = 0;
+		graffiti_player = -1;
+		graffiti_color = c_white;
+		
+		on_step = LimoProp_step
+		
+		return self;
+	}
+	
+#define LimoProp_step
+my_health = maxhealth;
+
+//#endregion
+
 //#region FROZEN CITY:
 #define WoolyMaggot_create(_x, _y)
 	with instance_create(_x, _y, CustomEnemy){
