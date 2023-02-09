@@ -29,10 +29,10 @@
 		global.sprJavlineerBanditFire = sprite_add("sprites/EliteBandits/JavelineerBandit/sprJavlineerBanditFire.png", 3, 12, 12);
 		
 		//Limousine Prop Sprites:
-		global.sprLimoPropIdle = sprite_add("sprites/Limousine/sprLimoPropIdle.png", 1, 19, 50);
-		global.sprLimoPropHurt = sprite_add("sprites/Limousine/sprLimoPropHurt.png", 3, 19, 50);
-		global.sprLimoPropGraffiti = sprite_add("sprites/Limousine/sprLimoPropGraffiti.png", 6, 19, 50);
-		global.mskLimoProp = sprite_add("sprites/Limousine/mskLimoProp.png", 1, 19, 50);
+		global.sprLimoPropIdle		= sprite_add("sprites/Limousine/Prop/sprLimoPropIdle.png", 1, 19, 50);
+		global.sprLimoPropHurt		= sprite_add("sprites/Limousine/Prop/sprLimoPropHurt.png", 3, 19, 50);
+		global.sprLimoPropGraffiti	= sprite_add("sprites/Limousine/Prop/sprLimoPropGraffiti.png", 6, 19, 50);
+		global.mskLimoProp			= sprite_add("sprites/Limousine/Prop/mskLimoProp.png", 1, 19, 50);
 #define step 
     
       // Level Start:
