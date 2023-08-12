@@ -9,11 +9,11 @@
 		global.sprWoolyMaggotCharge = sprite_add("sprites/WoolyMaggotFamily/WoolyMaggot/sprWoolyMaggotCharge.png", 5, 8, 8);
 		global.sprStaticTrail = sprite_add("sprites/WoolyMaggotFamily/WoolyMaggot/sprStaticTrail.png", 3, 4, 4);
 		//Big Wooly Maggot Sprites:
-		global.sprBigWoolyMaggotIdle = sprite_add("sprites/WoolyMaggotFamily/BigWoolyMaggot/sprBigWoolyMaggotIdle.png", 6, 24, 16);
-		global.sprBigWoolyMaggotHurt = sprite_add("sprites/WoolyMaggotFamily/BigWoolyMaggot/sprBigWoolyMaggotHurt.png", 6, 24, 16);
-		global.sprBigWoolyMaggotDead = sprite_add("sprites/WoolyMaggotFamily/BigWoolyMaggot/sprBigWoolyMaggotIdle.png", 6, 24, 16);
-		global.sprBigWoolyMaggotAppear = sprite_add("sprites/WoolyMaggotFamily/BigWoolyMaggot/sprBigWoolyMaggotIdle.png", 6, 24, 16);
-		global.sprBigWoolyMaggotBurrow = sprite_add("sprites/WoolyMaggotFamily/BigWoolyMaggot/sprBigWoolyMaggotIdle.png", 6, 24, 16);
+		global.sprBigWoolyMaggotIdle = sprite_add("sprites/WoolyMaggotFamily/BigWoolyMaggot/sprBigWoolyMaggotIdle.png", 6, 24, 18);
+		global.sprBigWoolyMaggotHurt = sprite_add("sprites/WoolyMaggotFamily/BigWoolyMaggot/sprBigWoolyMaggotHurt.png", 3, 24, 18);
+		global.sprBigWoolyMaggotDead = sprite_add("sprites/WoolyMaggotFamily/BigWoolyMaggot/sprBigWoolyMaggotIdle.png", 6, 24, 18);
+		global.sprBigWoolyMaggotAppear = sprite_add("sprites/WoolyMaggotFamily/BigWoolyMaggot/sprBigWoolyMaggotIdle.png", 6, 24, 18);
+		global.sprBigWoolyMaggotBurrow = sprite_add("sprites/WoolyMaggotFamily/BigWoolyMaggot/sprBigWoolyMaggotIdle.png", 6, 24, 18);
 		//Wooly Worm Sprites:
 		//Thief Sprites:
 		//Rat Canister Sprites:
@@ -705,7 +705,7 @@
 		enemy_look(direction);
 	}
 	
-#define Chick(_dmg, _spd, _dir)
+#define Chick_hurt(_dmg, _spd, _dir)
     
     sprite_index = spr_hurt;
 	image_index  = 0;
