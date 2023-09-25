@@ -2,6 +2,11 @@
 
 		global.level_start = false;
 		
+		global.limo_data = {
+			statue_desecrator		: 0,
+			statue_desecrateframe	: 0
+		};
+		
 		//Wooly Maggot Sprites:
 		global.sprWoolyMaggotIdle = sprite_add("sprites/WoolyMaggotFamily/WoolyMaggot/sprWoolyMaggotIdle.png", 4, 8, 8);
 		global.sprWoolyMaggotHurt = sprite_add("sprites/WoolyMaggotFamily/WoolyMaggot/sprWoolyMaggotHurt.png", 3, 8, 8);
@@ -52,6 +57,32 @@
                     mod_script_call('mod', 'foesfreaksfiends', 'WoolyMaggot_create', x, y);
                     instance_delete(self);
                 }
+            }
+            
+            break;
+            
+            case 103:
+            case "mansion":
+            with(GoldChest){
+				var _floors = instances_inside_rect(x - 128*2, y - 128*2, x + 128*2, y + 128*2, Floor), _loop = true;
+				
+				while (_loop){
+					if (!array_length(_floors)){
+						_loop = false;
+					}
+					else{
+						var i = irandom(array_length(_floors) - 1);
+						with (_floors[i]){
+							var _wall = array_length(instances_inside_rect(x + 16 - 32, y + 16 - 32, x + 16 + 32, y + 16 + 32, Wall));
+							if (!_wall && distance_to_object(GoldChest) >= 16){
+								instance_create(x + 16, y + 16, PortalClear);
+								mod_script_call('mod', 'foesfreaksfiends', 'LimoProp_create', x + 16, y + 16);
+								_loop = false;
+							}
+							else _floors = array_delete(_floors, i)
+						}
+					}
+				}
             }
             
             break;
@@ -718,7 +749,7 @@
     nexthurt   = current_frame + 6;
 	my_health -= _dmg;	
 #define LimoProp_create(_x, _y)
-	with(instance_create(_x, _y, CustomProp)){
+	with(instance_create(_x, _y, CustomHitme)){
 		 // Visual:
 		spr_idle	= global.sprLimoPropIdle;
 		spr_hurt	= global.sprLimoPropHurt;
@@ -728,7 +759,7 @@
 		spr_shadow_y = -1;
 		
 		image_xscale = 1;
-		depth = -5;
+		depth = 0;
 		 // Sounds:
 		snd_hurt	= sndStatueHurt;
 		snd_dead	= sndStatueDead;
@@ -739,17 +770,19 @@
 		mask_index	= global.mskLimoProp
 		team		= 0;
 		
-		graffiti_frame = 0;
-		graffiti_player = -1;
-		graffiti_color = c_white;
-		
 		on_step = LimoProp_step
+		on_draw = LimoProp_draw
 		
 		return self;
 	}
 	
 #define LimoProp_step
+speed = 0;
 my_health = maxhealth;
+
+#define LimoProp_draw
+draw_self();
+draw_sprite_ext(global.sprLimoPropGraffiti, 0, x, y, image_xscale, image_yscale, image_angle, player_get_color(global.limo_data.statue_desecrator), image_alpha);
 
 //#endregion
 
@@ -1493,3 +1526,11 @@ my_health = maxhealth;
 	sound_volume(_snd, audio_sound_get_gain(_snd) * _volume);
 	
 	return _snd;
+	
+#define instances_inside_rect(_x1, _y1, _x2, _y2, _obj)
+return instances_matching_le(instances_matching_ge(instances_matching_le(instances_matching_ge(_obj, "bbox_right", _x1), "bbox_left", _x2), "bbox_bottom", _y1), "bbox_top", _y2);
+
+#define array_delete(_array, _index)
+	var _new = array_slice(_array, 0, _index);
+	array_copy(_new, _index, _array, _index + 1, array_length(_array) - (_index + 1));
+	return _new;
