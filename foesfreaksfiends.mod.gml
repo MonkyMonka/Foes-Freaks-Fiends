@@ -86,7 +86,6 @@
             }
             
             break;
-                           
             }
 
             global.level_start = false;
@@ -94,11 +93,11 @@
     }
     
     
-    if button_pressed(0,"horn"){
-	repeat(1){
-	BigWoolyMaggot_create(mouse_x,mouse_y);
-	    }
-    } 
+    //if button_pressed(0,"horn"){
+	//repeat(1){
+	//BigWoolyMaggot_create(mouse_x,mouse_y);
+	//    }
+    //} 
 
 //#region DESERT:
 #define JavlineerBandit_create(_x, _y)
