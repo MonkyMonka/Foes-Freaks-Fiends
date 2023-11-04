@@ -1,43 +1,74 @@
 #define init
 
-		global.level_start = false;
+	
+	global.level_start = false;
 		
-		global.limo_data = {
-			statue_desecrator		: 0,
-			statue_desecrateframe	: 0
-		};
+	global.limo_data = {
+		statue_desecrator		: -1,
+		statue_desecrateframe	: 0
+	};
 		
-		//Wooly Maggot Sprites:
-		global.sprWoolyMaggotIdle = sprite_add("sprites/WoolyMaggotFamily/WoolyMaggot/sprWoolyMaggotIdle.png", 4, 8, 8);
-		global.sprWoolyMaggotHurt = sprite_add("sprites/WoolyMaggotFamily/WoolyMaggot/sprWoolyMaggotHurt.png", 3, 8, 8);
-		global.sprWoolyMaggotDead = sprite_add("sprites/WoolyMaggotFamily/WoolyMaggot/sprWoolyMaggotDead.png", 6, 8, 8);
-		global.sprWoolyMaggotCharge = sprite_add("sprites/WoolyMaggotFamily/WoolyMaggot/sprWoolyMaggotCharge.png", 5, 8, 8);
-		global.sprStaticTrail = sprite_add("sprites/WoolyMaggotFamily/WoolyMaggot/sprStaticTrail.png", 3, 4, 4);
-		//Big Wooly Maggot Sprites:
-		global.sprBigWoolyMaggotIdle = sprite_add("sprites/WoolyMaggotFamily/BigWoolyMaggot/sprBigWoolyMaggotIdle.png", 6, 24, 18);
-		global.sprBigWoolyMaggotHurt = sprite_add("sprites/WoolyMaggotFamily/BigWoolyMaggot/sprBigWoolyMaggotHurt.png", 3, 24, 18);
-		global.sprBigWoolyMaggotDead = sprite_add("sprites/WoolyMaggotFamily/BigWoolyMaggot/sprBigWoolyMaggotIdle.png", 6, 24, 18);
-		global.sprBigWoolyMaggotAppear = sprite_add("sprites/WoolyMaggotFamily/BigWoolyMaggot/sprBigWoolyMaggotIdle.png", 6, 24, 18);
-		global.sprBigWoolyMaggotBurrow = sprite_add("sprites/WoolyMaggotFamily/BigWoolyMaggot/sprBigWoolyMaggotIdle.png", 6, 24, 18);
-		//Wooly Worm Sprites:
-		//Thief Sprites:
-		//Rat Canister Sprites:
-		global.sprRatCanisterIdle = sprite_add("sprites/RatCanister/sprRatCanisterIdle.png", 4, 12, 12);
-		global.sprRatCanisterHurt = sprite_add("sprites/RatCanister/sprRatCanisterHurt.png", 3, 12, 12);
-		global.sprRatCanisterDead = sprite_add("sprites/RatCanister/sprRatCanisterDead.png", 6, 12, 12);
-		global.sprRatCanisterWalk = sprite_add("sprites/RatCanister/sprRatCanisterWalk.png", 6, 24, 12);
-		//Javlineer Bandit Sprites:
-		global.sprJavlineerBanditIdle = sprite_add("sprites/EliteBandits/JavelineerBandit/sprJavlineerBanditIdle.png", 4, 12, 12);
-		global.sprJavlineerBanditHurt = sprite_add("sprites/EliteBandits/JavelineerBandit/sprJavlineerBanditHurt.png", 3, 12, 12);
-		global.sprJavlineerBanditDead = sprite_add("sprites/EliteBandits/JavelineerBandit/sprJavlineerBanditDead.png", 6, 12, 12);
-		global.sprJavlineerBanditWalk = sprite_add("sprites/EliteBandits/JavelineerBandit/sprJavlineerBanditWalk.png", 6, 12, 12);
-		global.sprJavlineerBanditFire = sprite_add("sprites/EliteBandits/JavelineerBandit/sprJavlineerBanditFire.png", 3, 12, 12);
+	//Wooly Maggot Sprites:
+	global.sprWoolyMaggotIdle = sprite_add("sprites/WoolyMaggotFamily/WoolyMaggot/sprWoolyMaggotIdle.png", 4, 8, 8);
+	global.sprWoolyMaggotHurt = sprite_add("sprites/WoolyMaggotFamily/WoolyMaggot/sprWoolyMaggotHurt.png", 3, 8, 8);
+	global.sprWoolyMaggotDead = sprite_add("sprites/WoolyMaggotFamily/WoolyMaggot/sprWoolyMaggotDead.png", 6, 8, 8);
+	global.sprWoolyMaggotCharge = sprite_add("sprites/WoolyMaggotFamily/WoolyMaggot/sprWoolyMaggotCharge.png", 5, 8, 8);
+	global.sprStaticTrail = sprite_add("sprites/WoolyMaggotFamily/WoolyMaggot/sprStaticTrail.png", 3, 4, 4);
+	//Big Wooly Maggot Sprites:
+	global.sprBigWoolyMaggotIdle = sprite_add("sprites/WoolyMaggotFamily/BigWoolyMaggot/sprBigWoolyMaggotIdle.png", 6, 24, 18);
+	global.sprBigWoolyMaggotHurt = sprite_add("sprites/WoolyMaggotFamily/BigWoolyMaggot/sprBigWoolyMaggotHurt.png", 3, 24, 18);
+	global.sprBigWoolyMaggotDead = sprite_add("sprites/WoolyMaggotFamily/BigWoolyMaggot/sprBigWoolyMaggotIdle.png", 6, 24, 18);
+	global.sprBigWoolyMaggotAppear = sprite_add("sprites/WoolyMaggotFamily/BigWoolyMaggot/sprBigWoolyMaggotIdle.png", 6, 24, 18);
+	global.sprBigWoolyMaggotBurrow = sprite_add("sprites/WoolyMaggotFamily/BigWoolyMaggot/sprBigWoolyMaggotIdle.png", 6, 24, 18);
+	//Wooly Worm Sprites:
+	//Thief Sprites:
+	//Rat Canister Sprites:
+	global.sprRatCanisterIdle = sprite_add("sprites/RatCanister/sprRatCanisterIdle.png", 4, 12, 12);
+	global.sprRatCanisterHurt = sprite_add("sprites/RatCanister/sprRatCanisterHurt.png", 3, 12, 12);
+	global.sprRatCanisterDead = sprite_add("sprites/RatCanister/sprRatCanisterDead.png", 6, 12, 12);
+	global.sprRatCanisterWalk = sprite_add("sprites/RatCanister/sprRatCanisterWalk.png", 6, 24, 12);
+	//Javlineer Bandit Sprites:
+	global.sprJavlineerBanditIdle = sprite_add("sprites/EliteBandits/JavelineerBandit/sprJavlineerBanditIdle.png", 4, 12, 12);
+	global.sprJavlineerBanditHurt = sprite_add("sprites/EliteBandits/JavelineerBandit/sprJavlineerBanditHurt.png", 3, 12, 12);
+	global.sprJavlineerBanditDead = sprite_add("sprites/EliteBandits/JavelineerBandit/sprJavlineerBanditDead.png", 6, 12, 12);
+	global.sprJavlineerBanditWalk = sprite_add("sprites/EliteBandits/JavelineerBandit/sprJavlineerBanditWalk.png", 6, 12, 12);
+	global.sprJavlineerBanditFire = sprite_add("sprites/EliteBandits/JavelineerBandit/sprJavlineerBanditFire.png", 3, 12, 12);
 		
-		//Limousine Prop Sprites:
-		global.sprLimoPropIdle		= sprite_add("sprites/EliteMansion/Limousine/Prop/sprLimoPropIdle.png", 1, 19, 50);
-		global.sprLimoPropHurt		= sprite_add("sprites/EliteMansion/Limousine/Prop/sprLimoPropHurt.png", 3, 19, 50);
-		global.sprLimoPropGraffiti	= sprite_add("sprites/EliteMansion/Limousine/Prop/sprLimoPropGraffiti.png", 6, 19, 50);
-		global.mskLimoProp			= sprite_add("sprites/EliteMansion/Limousine/Prop/mskLimoProp.png", 1, 19, 50);
+	//Limousine Prop Sprites:
+	global.sprLimoPropIdle		= sprite_add("sprites/EliteMansion/Limousine/Prop/sprLimoPropIdle.png", 1, 19, 50);
+	global.sprLimoPropHurt		= sprite_add("sprites/EliteMansion/Limousine/Prop/sprLimoPropHurt.png", 3, 19, 50);
+	global.sprLimoPropBaseIdle	= sprite_add("sprites/EliteMansion/Limousine/Prop/sprLimoPropBaseIdle.png", 1, 19, 50);
+	global.sprLimoPropBaseHurt	= sprite_add("sprites/EliteMansion/Limousine/Prop/sprLimoPropBaseHurt.png", 3, 19, 50);
+	global.sprLimoGraffiti		= sprite_add("sprites/EliteMansion/Limousine/Prop/sprGraffiti.png", 8, 19, 50);
+	global.sprLimoGraffitiPuff	= sprite_add("sprites/EliteMansion/Limousine/Prop/sprGraffitiPuff.png", 5, 8, 8);
+	global.mskLimoProp			= sprite_add("sprites/EliteMansion/Limousine/Prop/mskLimoProp.png", 1, 19, 50);
+	
+	global.libLoaded = false;
+	if (fork())
+	{
+		while(!mod_exists("mod", "lib")) {wait(1);}
+	
+	    script_ref_call(["mod", "lib", "getRef"], "mod", mod_current, "scr");
+	
+	    var modules = ["libGeneral", "libAreas"];
+	    with(modules) call(scr.import, self);
+	    
+	    global.libLoaded = true;
+	    exit;
+	}
+	
+	#macro  scr  global.scr
+	#macro  call script_ref_call
+	#macro bbox_center_x (bbox_left + bbox_right + 1) / 2
+	#macro bbox_center_y (bbox_top + bbox_bottom + 1) / 2
+	#macro FloorNormal instances_matching(Floor, "object_index", Floor)
+
+#define game_start
+	global.limo_data = {
+		statue_desecrator		: -1,
+		statue_desecrateframe	: 0
+	};
+
 #define step 
     
       // Level Start:
@@ -63,27 +94,38 @@
             
             case 103:
             case "mansion":
-            with(GoldChest){
-				var _floors = instances_inside_rect(x - 128*2, y - 128*2, x + 128*2, y + 128*2, Floor), _loop = true;
-				
-				while (_loop){
-					if (!array_length(_floors)){
-						_loop = false;
-					}
-					else{
-						var i = irandom(array_length(_floors) - 1);
-						with (_floors[i]){
-							var _wall = array_length(instances_inside_rect(x + 16 - 32, y + 16 - 32, x + 16 + 32, y + 16 + 32, Wall));
-							if (!_wall && distance_to_object(GoldChest) >= 16){
-								instance_create(x + 16, y + 16, PortalClear);
-								mod_script_call('mod', 'foesfreaksfiends', 'LimoProp_create', x + 16, y + 16);
-								_loop = false;
-							}
-							else _floors = array_delete(_floors, i)
-						}
+            var	_entranceFloor = [], _entranceIndex = -1
+        	
+			with (FloorNormal)
+			{
+				if( point_distance(bbox_center_x, bbox_center_y, _spawnX, _spawnY) > 48)
+				{
+					if (!place_meeting(x, y, Wall) && !place_meeting(x, y, prop) && !place_meeting(x, y, chestprop))
+					{
+						array_push(_entranceFloor, self);
+						_entranceIndex++;
 					}
 				}
-            }
+			}
+			
+			call(scr.array_shuffle,(_entranceFloor));
+	        if	(_entranceIndex >= 0) with(_entranceFloor[_entranceIndex--])
+	        {
+	        	var	_w          = 3,
+					_h          = 3,
+					_type       = "",
+					_dirOff     = 0,
+					_floorDis   = 0,
+					_spawnX     = x,
+					_spawnY     = y,
+					_spawnDis   = 128,
+					_spawnFloor = FloorNormal;
+		
+				with call(scr.floor_room, _spawnX, _spawnY, _spawnDis, _spawnFloor, _w, _h, _type, _dirOff, _floorDis)
+				{
+					LimoProp_create(x, y);
+				}		
+	        }
             
             break;
             }
@@ -98,6 +140,20 @@
 	//BigWoolyMaggot_create(mouse_x,mouse_y);
 	//    }
     //} 
+
+#define draw
+	with (instances_matching(CustomProp, "name", "F3_Limo Prop"))
+	{
+		var _idle = sprite_index == spr_idle,
+			_data = global.limo_data;
+			
+		draw_sprite_ext(_idle ? spr_idlestatue : spr_hurtstatue, image_index, x, y, image_xscale, image_yscale, image_angle, c_white, image_alpha);
+		
+		if (_data.statue_desecrator > -1)
+		{
+			draw_sprite_ext(global.sprLimoGraffiti, _data.statue_desecrateframe, x, y, image_xscale, image_yscale, image_angle, player_get_color(_data.statue_desecrator), image_alpha);
+		}
+	}
 
 //#region DESERT:
 #define JavlineerBandit_create(_x, _y)
@@ -748,11 +804,13 @@
     nexthurt   = current_frame + 6;
 	my_health -= _dmg;	
 #define LimoProp_create(_x, _y)
-	with(instance_create(_x, _y, CustomHitme)){
+	with(instance_create(_x, _y, CustomProp)){
 		 // Visual:
-		spr_idle	= global.sprLimoPropIdle;
-		spr_hurt	= global.sprLimoPropHurt;
-		spr_dead	= global.sprLimoPropHurt;
+		spr_idle	= global.sprLimoPropBaseIdle;
+		spr_hurt	= global.sprLimoPropBaseHurt;
+		spr_dead	= global.sprLimoPropBaseHurt;
+		spr_idlestatue = global.sprLimoPropIdle;
+		spr_hurtstatue = global.sprLimoPropHurt;
 		
 		spr_shadow = shd32;
 		spr_shadow_y = -1;
@@ -763,26 +821,68 @@
 		snd_hurt	= sndStatueHurt;
 		snd_dead	= sndStatueDead;
 		 // Vars:
-		name = "Limo Prop"
+		name = "F3_Limo Prop";
 		maxhealth	= 999999;
 		my_health	= maxhealth;
-		mask_index	= global.mskLimoProp
+		mask_index	= global.mskLimoProp;
+		
 		team		= 0;
 		
-		on_step = LimoProp_step
-		on_draw = LimoProp_draw
+		var _clean = global.limo_data.statue_desecrator == -1;
+		prompt = call(scr.prompt_create, _clean ? "DESECRATE" : "CLEAN");
+		
+		on_step = LimoProp_step;
+		on_pick = script_ref_create(LimoProp_desecrate);
 		
 		return self;
 	}
 	
 #define LimoProp_step
-speed = 0;
-my_health = maxhealth;
+	speed = 0;
+	my_health = maxhealth;
 
-#define LimoProp_draw
-draw_self();
-draw_sprite_ext(global.sprLimoPropGraffiti, 0, x, y, image_xscale, image_yscale, image_angle, player_get_color(global.limo_data.statue_desecrator), image_alpha);
-
+#define LimoProp_desecrate
+	view_shake_at(x, y, 10);
+	var _clean = global.limo_data.statue_desecrator == -1;
+	
+	if (_clean)
+	{
+		global.limo_data.statue_desecrator = other.index;
+		global.limo_data.statue_desecrateframe = irandom(sprite_get_number(global.sprLimoGraffiti) - 1);
+		prompt.text = "CLEAN";
+		
+		sound_play_pitch(sndFlamerStart, random_range(1.1, 1.4));
+		repeat(17)
+		{
+			with instance_create(x, y, Dust)
+			{
+				motion_set(random(360), random_range(1, 4));
+				friction = 0.1;
+				depth -= 10;
+				image_angle = random(360);
+				sprite_index = global.sprLimoGraffitiPuff;
+				image_blend = player_get_color(global.limo_data.statue_desecrator);
+			}
+		}
+	}
+	else
+	{
+		global.limo_data.statue_desecrator = -1;
+		global.limo_data.statue_desecrateframe = 0;
+		prompt.text = "DESECRATE";
+		
+		sound_play_pitch(sndOasisPortal, random_range(1, 1.2));
+		repeat(17)
+		{
+			with instance_create(x, y, Bubble)
+			{
+				motion_set(random(360), random_range(1, 4));
+				friction = 0.1;
+				depth -= 10;
+				image_angle = random(360);
+			}
+		}
+	}
 //#endregion
 
 //#region FROZEN CITY:

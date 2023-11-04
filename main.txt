@@ -1,1 +1,2 @@
-/loadmod foesfreaksfiends
+/loadmod libLoader
+/load main2.txt
