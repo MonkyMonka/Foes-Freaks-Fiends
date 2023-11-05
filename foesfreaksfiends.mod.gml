@@ -5,7 +5,8 @@
 		
 	global.limo_data = {
 		statue_desecrator		: -1,
-		statue_desecrateframe	: 0
+		statue_frame			: 0,
+		stages_num				: 0
 	};
 		
 	//Wooly Maggot Sprites:
@@ -42,6 +43,10 @@
 	global.sprLimoGraffiti		= sprite_add("sprites/EliteMansion/Limousine/Prop/sprGraffiti.png", 8, 19, 50);
 	global.sprLimoGraffitiPuff	= sprite_add("sprites/EliteMansion/Limousine/Prop/sprGraffitiPuff.png", 5, 8, 8);
 	global.mskLimoProp			= sprite_add("sprites/EliteMansion/Limousine/Prop/mskLimoProp.png", 1, 19, 50);
+	//Limousine Sprites:
+	global.sprYVLimo	= sprite_add("sprites/EliteMansion/Limousine/sprLimousine.png", 17, 64, 16);
+	global.sprYVLimoHurt= sprite_add("sprites/EliteMansion/Limousine/sprLimousineHurt.png", 17, 64, 16);
+	global.mskYVLimo	= sprite_add("sprites/EliteMansion/Limousine/mskLimousine.png", 1, 64, 16);
 	
 	global.libLoaded = false;
 	if (fork())
@@ -56,17 +61,12 @@
 	    global.libLoaded = true;
 	    exit;
 	}
-	
-	#macro  scr  global.scr
-	#macro  call script_ref_call
-	#macro bbox_center_x (bbox_left + bbox_right + 1) / 2
-	#macro bbox_center_y (bbox_top + bbox_bottom + 1) / 2
-	#macro FloorNormal instances_matching(Floor, "object_index", Floor)
 
 #define game_start
 	global.limo_data = {
 		statue_desecrator		: -1,
-		statue_desecrateframe	: 0
+		statue_frame			: 0,
+		stages_num				: 0
 	};
 
 #define step 
@@ -77,7 +77,9 @@
     }
     else{
         if(global.level_start){
-
+        	
+        if (global.limo_data.statue_desecrator != -1) global.limo_data.stages_num ++;
+		
         switch(GameCont.area){
             
             case 5:
@@ -109,9 +111,9 @@
 			}
 			
 			call(scr.array_shuffle,(_entranceFloor));
-	        if	(_entranceIndex >= 0) with(_entranceFloor[_entranceIndex--])
-	        {
-	        	var	_w          = 3,
+			if	(_entranceIndex >= 0) with(_entranceFloor[_entranceIndex--])
+			{
+				var	_w          = 3,
 					_h          = 3,
 					_type       = "",
 					_dirOff     = 0,
@@ -125,24 +127,28 @@
 				{
 					LimoProp_create(x, y);
 				}		
-	        }
-            
+			}
+				
             break;
             }
-
+            
             global.level_start = false;
         }
     }
     
     
-    //if button_pressed(0,"horn"){
-	//repeat(1){
-	//BigWoolyMaggot_create(mouse_x,mouse_y);
-	//    }
-    //} 
+    /*
+    if button_pressed(0,"horn")
+    {
+		repeat(1)\
+		{
+			instance_create(mouse_x, mouse_y, BigDogExplo);
+		}
+    }
+    */
 
 #define draw
-	with (instances_matching(CustomProp, "name", "F3_Limo Prop"))
+	with (instances_matching(CustomProp, "name", "Limo Prop"))
 	{
 		var _idle = sprite_index == spr_idle,
 			_data = global.limo_data;
@@ -151,7 +157,7 @@
 		
 		if (_data.statue_desecrator > -1)
 		{
-			draw_sprite_ext(global.sprLimoGraffiti, _data.statue_desecrateframe, x, y, image_xscale, image_yscale, image_angle, player_get_color(_data.statue_desecrator), image_alpha);
+			draw_sprite_ext(global.sprLimoGraffiti, _data.statue_frame, x, y, image_xscale, image_yscale, image_angle, player_get_color(_data.statue_desecrator), image_alpha);
 		}
 	}
 
@@ -821,18 +827,18 @@
 		snd_hurt	= sndStatueHurt;
 		snd_dead	= sndStatueDead;
 		 // Vars:
-		name = "F3_Limo Prop";
+		name = "Limo Prop";
 		maxhealth	= 999999;
 		my_health	= maxhealth;
 		mask_index	= global.mskLimoProp;
 		
 		team		= 0;
 		
-		var _clean = global.limo_data.statue_desecrator == -1;
-		prompt = call(scr.prompt_create, _clean ? "DESECRATE" : "CLEAN");
+		var _isclean = global.limo_data.statue_desecrator == -1;
+		prompt = call(scr.prompt_create, _isclean ? "DESECRATE" : "CLEAN");
 		
 		on_step = LimoProp_step;
-		on_pick = script_ref_create(LimoProp_desecrate);
+		on_pick = script_ref_create(LimoProp_interact);
 		
 		return self;
 	}
@@ -841,14 +847,15 @@
 	speed = 0;
 	my_health = maxhealth;
 
-#define LimoProp_desecrate
+#define LimoProp_interact
 	view_shake_at(x, y, 10);
-	var _clean = global.limo_data.statue_desecrator == -1;
+	var _isclean = global.limo_data.statue_desecrator == -1;
 	
-	if (_clean)
+	if (_isclean)
 	{
 		global.limo_data.statue_desecrator = other.index;
-		global.limo_data.statue_desecrateframe = irandom(sprite_get_number(global.sprLimoGraffiti) - 1);
+		global.limo_data.statue_frame = irandom(sprite_get_number(global.sprLimoGraffiti) - 1);
+		global.limo_data.stages_num = 0;
 		prompt.text = "CLEAN";
 		
 		sound_play_pitch(sndFlamerStart, random_range(1.1, 1.4));
@@ -868,7 +875,7 @@
 	else
 	{
 		global.limo_data.statue_desecrator = -1;
-		global.limo_data.statue_desecrateframe = 0;
+		global.limo_data.statue_frame = 0;
 		prompt.text = "DESECRATE";
 		
 		sound_play_pitch(sndOasisPortal, random_range(1, 1.2));
@@ -882,7 +889,118 @@
 				image_angle = random(360);
 			}
 		}
+		
+		/* REWARD!
+		
+			@Monka you come up with REWARD pls? :pleading: :gayhorse: -chomk
+			
+			           ,--,
+			     _ ___/ /\|
+			 ,;'( )__, )  ~
+			//  //   '--; 
+			'   \     | ^
+			     ^    ^
+			     
+			i made that (thats a lie) -chomk
+		*/
+		
+		global.limo_data.stages_num = 0;
 	}
+	
+#define YVLimo_create(_x, _y)
+	with instance_create(_x, _y, CustomEnemy)
+	{
+		// youll want to set the name here, both because I stuck it in hitid and for mod support
+		name = "YV Limo";
+		
+        // this is where you'll set your sprites and such, nts_color_blood isn't needed but makes it work with various blood mods, so its just nice to add.
+        // Visuals:
+        spr_idle = sprBanditIdle;
+		spr_walk = sprBanditWalk;
+		spr_hurt = sprBanditHurt
+		spr_dead = mskNone;
+		spr_fire = mskNone;
+		
+		sprite_index    = spr_idle;
+		depth           = -2;
+		hitid           = [sprMutant6Sit, name]
+        spr_shadow      = shd16;	
+        nts_color_blood = [c_red, make_color_rgb(134, 44, 35)]
+        
+        
+        // this is where you change your enemy's stats and add any needed variables, most should be self explanatory but if you need help ask.
+        // Vars:
+        mask_index    = global.mskYVLimo;
+        direction     = random(360);
+        maxhealth     = 100 + GameCont.loops*100;
+       	my_health     = maxhealth;
+        raddrop       = 90;
+        maxspeed      = 2.5;
+        walkspeed     = maxspeed;
+        canmelee      = 1;
+        meleedamage   = 3;
+        team          = 4;
+        targetvisible = 0;
+        target        = 0;
+        walk          = 0;
+        gunangle      = 180;
+        fff_bloomamount = 0;
+        fff_bloomtransparency = 0.1;
+        size = 3;
+        corpse = false;
+        
+        snd_hurt = sndHitMetal;
+        snd_mele = sndBigDogHit;
+
+        // setting your alarm amounts here is basically just how quickly they can attack after spawning, usually just keep it at this amount.
+        // if you need something to be able to attack RIGHT after spawning set it to like 10 or something.
+        // Alarms:
+        alarm1 = 40 + irandom(30);
+         
+        // set you stuff in here, I have some generic things to set, scroll to the bottom of the file to see them if you want.
+        // GunEnemy_draw is for drawing an enemy that wields a ranged weapon, theres also BasicEnemy_draw (no weapon) and MeleeEnemy_draw (melee weapon) in this file.
+        // Enemy_hurt is just a standard enemy hurt function, replace it if you want a special on_hurt effect.
+        // StandardDrops drops what is pretty much a 'Normal' amount of pickups.
+        // Alrm1 is where you'll set your actual attacks, you can have more than one alarm but the majority of enemies dont need them and I dont feel like explaining it.
+        
+        //Scripts:
+        //on_step  = script_ref_create(WoolyMaggot_step);
+        on_draw  = YVLimo_draw;
+        //on_hurt  = WoolyMaggot_hurt;
+        on_death = YVLimo_death;
+        //on_alrm1 = script_ref_create(WoolyMaggot_alrm1);
+        
+        return self;
+	}
+
+#define YVLimo_draw
+	draw_spritestack((sprite_index == spr_hurt && image_index == 0) ? global.sprYVLimoHurt : global.sprYVLimo, x, y, image_xscale, image_yscale, direction, image_blend, image_alpha, 0.5);
+
+#define YVLimo_death
+	pickup_drop(40, 15, 4);
+	
+	with (YVLimoExplo_create(x, y))
+	{
+		depth	= -2;
+	}
+	
+#define YVLimoExplo_create(_x, _y)
+	with instance_create(_x, _y, CustomObject)
+	{
+		timer = 0;
+		on_step = YVLimoExplo_step;
+		on_draw = YVLimoExplo_draw;
+		
+		return self;
+	}
+	
+#define YVLimoExplo_step
+	timer += current_time_scale;
+
+
+#define YVLimoExplo_draw
+	draw_spritestack((sprite_index == spr_hurt && image_index == 0) ? global.sprYVLimoHurt : global.sprYVLimo, x, y, image_xscale, image_yscale, direction, image_blend, image_alpha, 0.5);
+
 //#endregion
 
 //#region FROZEN CITY:
@@ -1527,6 +1645,8 @@
     // These are all some helpful functions and macros, I make use of them a lot .
     // im not going to bother writing about them, if you want to know what does what just ask, although I might not remember since these are snatched from relics iirc.
 
+#macro	bbox_center_x																			(bbox_left + bbox_right + 1) / 2
+#macro	bbox_center_y																			(bbox_top + bbox_bottom + 1) / 2
 #macro  target_visible                                                                          !collision_line(x, y, target.x, target.y, Wall, false, false)
 #macro  target_direction                                                                        point_direction(x, y, target.x, target.y)
 #macro  target_distance                                                                         point_distance(x, y, target.x, target.y)
@@ -1542,6 +1662,9 @@
 #macro  alarm7_run                                                                              alarm7 && !--alarm7 && !--alarm7 && (script_ref_call(on_alrm7) || !instance_exists(self))
 #macro  alarm8_run                                                                              alarm8 && !--alarm8 && !--alarm8 && (script_ref_call(on_alrm8) || !instance_exists(self))
 #macro  alarm9_run                                                                              alarm9 && !--alarm9 && !--alarm9 && (script_ref_call(on_alrm9) || !instance_exists(self))
+#macro  scr 																					global.scr
+#macro  call																					script_ref_call
+#macro	FloorNormal																				instances_matching(Floor, "object_index", Floor)
 #define orandom(_num)                                                                   		return  random_range(-_num, _num);
 #define chance(_numer, _denom)                                                          		return  random(_denom) < _numer;
 #define chance_ct(_numer, _denom)                                                       		return  random(_denom) < _numer * current_time_scale;
@@ -1633,3 +1756,19 @@ return instances_matching_le(instances_matching_ge(instances_matching_le(instanc
 	var _new = array_slice(_array, 0, _index);
 	array_copy(_new, _index, _array, _index + 1, array_length(_array) - (_index + 1));
 	return _new;
+	
+#define draw_spritestack(_sprite, _x, _y, _xscale, _yscale, _angle, _blend, _alpha, _tilt)
+	d3d_set_fog(1, c_black, 0, 0);
+	for (var i = 0; i < sprite_get_number(_sprite); i++)
+	{
+		draw_sprite_ext(_sprite, i, _x, _y-i*_tilt-1, _xscale, _yscale, _angle, _blend, _alpha);
+		draw_sprite_ext(_sprite, i, _x, _y-i*_tilt+1, _xscale, _yscale, _angle, _blend, _alpha);
+		draw_sprite_ext(_sprite, i, _x+1, _y-i*_tilt, _xscale, _yscale, _angle, _blend, _alpha);
+		draw_sprite_ext(_sprite, i, _x-1, _y-i*_tilt, _xscale, _yscale, _angle, _blend, _alpha);
+	}
+	
+	d3d_set_fog(0, 0, 0, 0);
+	for(var i = 0; i < sprite_get_number(_sprite); i++)
+	{
+		draw_sprite_ext(_sprite, i, _x, _y-i*_tilt, _xscale, _yscale, _angle, _blend, _alpha);
+	}
