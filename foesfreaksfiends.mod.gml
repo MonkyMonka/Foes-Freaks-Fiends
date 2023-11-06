@@ -159,6 +159,12 @@
 		}
 	}
 
+#define draw_shadows
+	with (instances_matching(CustomEnemy, "name", "YV Limo"))
+	{
+		draw_sprite_ext(global.sprYVLimo, 8, x, y, 0.8, 0.8, image_angle, c_black, 1);
+	}
+
 //#region DESERT:
 #define JavlineerBandit_create(_x, _y)
 	with instance_create(_x, _y, CustomEnemy){
@@ -806,7 +812,8 @@
     audio_sound_gain(sound_play_hit(sndRatHit, 1.5), 1.5, 0.2);
     
     nexthurt   = current_frame + 6;
-	my_health -= _dmg;	
+	my_health -= _dmg;
+	
 #define LimoProp_create(_x, _y)
 	with(instance_create(_x, _y, CustomProp)){
 		 // Visual:
@@ -910,6 +917,11 @@
 		// youll want to set the name here, both because I stuck it in hitid and for mod support
 		name = "YV Limo";
 		
+		// Boss data
+		bossname = "Y.V. Limo";
+		boss = true;
+		col = c_red;
+		
         // this is where you'll set your sprites and such, nts_color_blood isn't needed but makes it work with various blood mods, so its just nice to add.
         // Visuals:
         spr_idle = sprBanditIdle;
@@ -921,7 +933,7 @@
 		sprite_index    = spr_idle;
 		depth           = -2;
 		hitid           = [sprMutant6Sit, name]
-        spr_shadow      = shd16;	
+        spr_shadow      = mskNone;	
         nts_color_blood = [c_red, make_color_rgb(134, 44, 35)]
         
         
@@ -929,14 +941,14 @@
         // Vars:
         mask_index    = global.mskYVLimo;
         direction     = random(360);
-        maxhealth     = 250 + GameCont.loops*250;
+        maxhealth     = 1000 + GameCont.loops*500;
        	my_health     = maxhealth;
         raddrop       = 90;
-        maxspeed      = 2.5;
+        maxspeed      = 3.5;
         walkspeed     = maxspeed;
-        canmelee      = 0;
-        meleedamage   = 0;
-        team          = 4;
+        canmelee      = 1;
+        meleedamage   = 2;
+        team          = 420;
         targetvisible = 0;
         target        = 0;
         walk          = 0;
@@ -951,6 +963,8 @@
 		
 		// Limo vars.:
 		image_angle = random(360);
+		hovertimer = 0;
+		targetangle = 0;
 		
         // setting your alarm amounts here is basically just how quickly they can attack after spawning, usually just keep it at this amount.
         // if you need something to be able to attack RIGHT after spawning set it to like 10 or something.
@@ -976,15 +990,34 @@
 
 #define YVLimo_step
 	speed = 0;
+	hovertimer += current_time_scale;
 	
-	/* MOVEMENT
-		IDK where to start with this shit LOL. -chomk
-	*/
+	if (array_length(instances_meeting(x, y, Wall)))
+	{
+		with instance_create(x, y, PortalClear)
+		{
+			mask_index = other.mask_index
+			image_xscale = 1.5;
+			image_yscale = 2;
+			image_angle = other.image_angle;
+		}
+	}
+	
+	if (enemy_target(x, y) && target_visible) targetangle = target_direction;
+	else targetangle = image_angle + 90;
+	
+	if(walk > 0){ walk -= current_time_scale;   speed += walkspeed * current_time_scale;   gunangle = direction }
+	if(speed > maxspeed){ speed = maxspeed; }
+	
+	image_angle += angle_difference(image_angle, targetangle)*0.1;
+	image_angle += 180;
+	enemy_walk(image_angle, 1);
 	
 	sprite_index = enemy_sprite;
 
 #define YVLimo_draw
-	draw_spritestack((sprite_index == spr_hurt && image_index == 0) ? global.sprYVLimoHurt : global.sprYVLimo, x, y, image_xscale, image_yscale, image_angle, image_blend, image_alpha, 0.5);
+	var _hurt = (sprite_index == spr_hurt && image_index == 0);
+	draw_spritestack(_hurt ? global.sprYVLimoHurt : global.sprYVLimo, x, y - sin_wave(8, 16, 0.1, random_range(-.02, .02), hovertimer), image_xscale, image_yscale, image_angle, image_blend, image_alpha, 0.5, _hurt ? c_white : c_black);
 
 #define YVLimo_death
 	pickup_drop(40, 15, 4);
@@ -993,6 +1026,7 @@
 	{
 		depth		= -2;
 		image_angle = other.image_angle;
+		hovertimer	= other.hovertimer;
 	}
 	
 #define YVLimoExplo_create(_x, _y)
@@ -1001,6 +1035,7 @@
 		timer = 0;
 		timerscale = 1;
 		explos = 10;
+		hovertimer = 0;
 		on_step = YVLimoExplo_step;
 		on_draw = YVLimoExplo_draw;
 		
@@ -1019,7 +1054,7 @@
 		if (explos)
 		{
 			sound_play(sndExplosionL);
-			repeat(9) { instance_create(x + random_range(-16, 16), y + random_range(-16, 16), SmallExplosion); }
+			repeat(9) { instance_create(x + random_range(-16, 16), y - 8 + random_range(-16, 16), SmallExplosion); }
 		}
 		else
 		{
@@ -1027,12 +1062,12 @@
 			repeat(18)
 			{
 				var _x = choose(x - 24, x + 24), _y = choose(y - 24, y + 24);
-				instance_create(_x + random_range(-16, 16), _y + random_range(-16, 16), ScorchTop);
+				instance_create(_x + random_range(-16, 16), _y - 8 + random_range(-16, 16), ScorchTop);
 			}
-			repeat(12) { instance_create(x + random_range(-32, 32), y + random_range(-32, 32), GroundFlame); }
+			repeat(12) { instance_create(x + random_range(-32, 32), y - 8 + random_range(-32, 32), GroundFlame); }
 			
-			repeat(11) { instance_create(x + random_range(-20, 20), y + random_range(-20, 20), SmallExplosion); }
-			repeat(5) { instance_create(x + random_range(-12, 12), y + random_range(-12, 12), Explosion); }
+			repeat(11) { instance_create(x + random_range(-20, 20), y - 8 + random_range(-20, 20), SmallExplosion); }
+			repeat(5) { instance_create(x + random_range(-12, 12), y  - 8 + random_range(-12, 12), Explosion); }
 			
 			instance_destroy();
 			
@@ -1044,7 +1079,8 @@
 
 
 #define YVLimoExplo_draw
-	draw_spritestack((timer % 5 < current_time_scale) ? global.sprYVLimoHurt : global.sprYVLimo, x, y, image_xscale, image_yscale, image_angle, image_blend, image_alpha, 0.5);
+	var _hurt = (timer % 5 < current_time_scale);
+	draw_spritestack(_hurt ? global.sprYVLimoHurt : global.sprYVLimo, x, y - sin_wave(8, 16, 0.1, 0, hovertimer), image_xscale, image_yscale, image_angle, image_blend, image_alpha, 0.5, _hurt ? c_white : c_black);
 
 //#endregion
 
@@ -1727,6 +1763,9 @@
     with(instances_matching_gt([CustomProjectile, CustomObject, CustomSlash, CustomEnemy], "fff_bloomamount", 0)){
         draw_sprite_ext(sprite_index, image_index, x, y, fff_bloomamount*image_xscale,  fff_bloomamount*image_yscale, image_angle, image_blend,  fff_bloomtransparency);
     }
+
+#define sin_wave(_from, _to, _dur, _offset, _time)												return _from + ((_to - _from) * 0.5) + sin((((_time * 0.001) + _dur * _offset) / _dur) * (pi * 2)) * ((_to - _from) * 0.5);
+
 #define nothing
 //not one thing!
 
@@ -1795,15 +1834,23 @@
 	return _snd;
 	
 #define instances_inside_rect(_x1, _y1, _x2, _y2, _obj)
-return instances_matching_le(instances_matching_ge(instances_matching_le(instances_matching_ge(_obj, "bbox_right", _x1), "bbox_left", _x2), "bbox_bottom", _y1), "bbox_top", _y2);
+	return instances_matching_le(instances_matching_ge(instances_matching_le(instances_matching_ge(_obj, "bbox_right", _x1), "bbox_left", _x2), "bbox_bottom", _y1), "bbox_top", _y2);
+
+#define instances_meeting(_x, _y, _obj)
+	var _tx = x, _ty = y;
+	x = _x; y = _y;
+	var _inst = instances_matching_ne(instances_matching_le(instances_matching_ge(instances_matching_le(instances_matching_ge(_obj, "bbox_right", bbox_left), "bbox_left", bbox_right), "bbox_bottom", bbox_top), "bbox_top", bbox_bottom), "id", id);
+	x = _tx; y = _ty;
+	    
+	return _inst;
 
 #define array_delete(_array, _index)
 	var _new = array_slice(_array, 0, _index);
 	array_copy(_new, _index, _array, _index + 1, array_length(_array) - (_index + 1));
 	return _new;
 	
-#define draw_spritestack(_sprite, _x, _y, _xscale, _yscale, _angle, _blend, _alpha, _tilt)
-	d3d_set_fog(1, c_black, 0, 0);
+#define draw_spritestack(_sprite, _x, _y, _xscale, _yscale, _angle, _blend, _alpha, _tilt, _outline)
+	d3d_set_fog(1, _outline, 0, 0);
 	for (var i = 0; i < sprite_get_number(_sprite); i++)
 	{
 		draw_sprite_ext(_sprite, i, _x, _y-i*_tilt-1, _xscale, _yscale, _angle, _blend, _alpha);
