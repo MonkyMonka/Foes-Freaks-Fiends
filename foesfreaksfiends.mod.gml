@@ -137,15 +137,13 @@
     }
     
     
-    /*
     if button_pressed(0,"horn")
     {
-		repeat(1)\
+		repeat(1)
 		{
-			instance_create(mouse_x, mouse_y, BigDogExplo);
+			YVLimo_create(mouse_x, mouse_y);
 		}
     }
-    */
 
 #define draw
 	with (instances_matching(CustomProp, "name", "Limo Prop"))
@@ -891,7 +889,6 @@
 		}
 		
 		/* REWARD!
-		
 			@Monka you come up with REWARD pls? :pleading: :gayhorse: -chomk
 			
 			           ,--,
@@ -932,13 +929,13 @@
         // Vars:
         mask_index    = global.mskYVLimo;
         direction     = random(360);
-        maxhealth     = 100 + GameCont.loops*100;
+        maxhealth     = 250 + GameCont.loops*250;
        	my_health     = maxhealth;
         raddrop       = 90;
         maxspeed      = 2.5;
         walkspeed     = maxspeed;
-        canmelee      = 1;
-        meleedamage   = 3;
+        canmelee      = 0;
+        meleedamage   = 0;
         team          = 4;
         targetvisible = 0;
         target        = 0;
@@ -946,16 +943,20 @@
         gunangle      = 180;
         fff_bloomamount = 0;
         fff_bloomtransparency = 0.1;
-        size = 3;
+        size = 4;
         corpse = false;
         
         snd_hurt = sndHitMetal;
         snd_mele = sndBigDogHit;
-
+		
+		// Limo vars.:
+		image_angle = random(360);
+		
         // setting your alarm amounts here is basically just how quickly they can attack after spawning, usually just keep it at this amount.
         // if you need something to be able to attack RIGHT after spawning set it to like 10 or something.
         // Alarms:
         alarm1 = 40 + irandom(30);
+        
          
         // set you stuff in here, I have some generic things to set, scroll to the bottom of the file to see them if you want.
         // GunEnemy_draw is for drawing an enemy that wields a ranged weapon, theres also BasicEnemy_draw (no weapon) and MeleeEnemy_draw (melee weapon) in this file.
@@ -964,30 +965,42 @@
         // Alrm1 is where you'll set your actual attacks, you can have more than one alarm but the majority of enemies dont need them and I dont feel like explaining it.
         
         //Scripts:
-        //on_step  = script_ref_create(WoolyMaggot_step);
+        on_step  = script_ref_create(YVLimo_step);
         on_draw  = YVLimo_draw;
-        //on_hurt  = WoolyMaggot_hurt;
+        on_hurt  = Enemy_hurt;
         on_death = YVLimo_death;
         //on_alrm1 = script_ref_create(WoolyMaggot_alrm1);
         
         return self;
 	}
 
+#define YVLimo_step
+	speed = 0;
+	
+	/* MOVEMENT
+		IDK where to start with this shit LOL. -chomk
+	*/
+	
+	sprite_index = enemy_sprite;
+
 #define YVLimo_draw
-	draw_spritestack((sprite_index == spr_hurt && image_index == 0) ? global.sprYVLimoHurt : global.sprYVLimo, x, y, image_xscale, image_yscale, direction, image_blend, image_alpha, 0.5);
+	draw_spritestack((sprite_index == spr_hurt && image_index == 0) ? global.sprYVLimoHurt : global.sprYVLimo, x, y, image_xscale, image_yscale, image_angle, image_blend, image_alpha, 0.5);
 
 #define YVLimo_death
 	pickup_drop(40, 15, 4);
 	
 	with (YVLimoExplo_create(x, y))
 	{
-		depth	= -2;
+		depth		= -2;
+		image_angle = other.image_angle;
 	}
 	
 #define YVLimoExplo_create(_x, _y)
 	with instance_create(_x, _y, CustomObject)
 	{
 		timer = 0;
+		timerscale = 1;
+		explos = 10;
 		on_step = YVLimoExplo_step;
 		on_draw = YVLimoExplo_draw;
 		
@@ -995,11 +1008,43 @@
 	}
 	
 #define YVLimoExplo_step
-	timer += current_time_scale;
+	timer += current_time_scale * timerscale;
+	
+	if (timer % 5 < current_time_scale)
+	{
+		timer = 0;
+		timerscale = random_range(0.8, 1.2);
+		explos --;
+		
+		if (explos)
+		{
+			sound_play(sndExplosionL);
+			repeat(9) { instance_create(x + random_range(-16, 16), y + random_range(-16, 16), SmallExplosion); }
+		}
+		else
+		{
+			sound_play(sndExplosionXL);
+			repeat(18)
+			{
+				var _x = choose(x - 24, x + 24), _y = choose(y - 24, y + 24);
+				instance_create(_x + random_range(-16, 16), _y + random_range(-16, 16), ScorchTop);
+			}
+			repeat(12) { instance_create(x + random_range(-32, 32), y + random_range(-32, 32), GroundFlame); }
+			
+			repeat(11) { instance_create(x + random_range(-20, 20), y + random_range(-20, 20), SmallExplosion); }
+			repeat(5) { instance_create(x + random_range(-12, 12), y + random_range(-12, 12), Explosion); }
+			
+			instance_destroy();
+			
+			/* ON-DEATH
+				Here is the code for the on-death shit. -chomk
+			*/
+		}
+	}
 
 
 #define YVLimoExplo_draw
-	draw_spritestack((sprite_index == spr_hurt && image_index == 0) ? global.sprYVLimoHurt : global.sprYVLimo, x, y, image_xscale, image_yscale, direction, image_blend, image_alpha, 0.5);
+	draw_spritestack((timer % 5 < current_time_scale) ? global.sprYVLimoHurt : global.sprYVLimo, x, y, image_xscale, image_yscale, image_angle, image_blend, image_alpha, 0.5);
 
 //#endregion
 
